@@ -29,11 +29,11 @@ Go to the project directory
 ## Author
 
 - Tayyab Kamran Sami 
--  Muhammad Hassnain
--  Abdul Ahad Tariq
+- Muhammad Hassnain
+- Abdul Ahad Tariq
 - Hammad Talat
--
+- Ahmed Moeez Azeem
 
 ## Feedback
 
-If you have any feedback, please reach out to us at tayyabsammy1@gmail.com, abdulahadg2004@gmail.com
+If you have any feedback, please reach out to us at tayyabsammy1@gmail.com, abdulahadg2004@gmail.com, azeemmoeez5@gmail.com
