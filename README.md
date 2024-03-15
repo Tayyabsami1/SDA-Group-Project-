@@ -29,7 +29,7 @@ Go to the project directory
 ## Author
 
 - Tayyab Kamran Sami 
--Muhammad Hassnain
+-  Muhammad Hassnain
 -
 -
 -
