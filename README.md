@@ -31,7 +31,7 @@ Go to the project directory
 - Tayyab Kamran Sami 
 -  Muhammad Hassnain
 -  Abdul Ahad Tariq
--
+- Hammad Talat
 -
 
 ## Feedback
