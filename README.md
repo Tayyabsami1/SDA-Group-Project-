@@ -1,6 +1,6 @@
 # SDA-Group-Project-
 It is a repository to submit our SDA project work 
-
+I am hassnain along with my group members, working on this project.
 ## Features
 
 - 
@@ -29,7 +29,7 @@ Go to the project directory
 ## Author
 
 - Tayyab Kamran Sami 
--
+-Muhammad Hassnain
 -
 -
 -
