@@ -1,6 +1,6 @@
 # SDA-Group-Project-
-It is a repository to submit our SDA project work 
-I am hassnain along with my group members, working on this project.
+We aim to develop a comprehensive weather app as part of our SDA project, meeting all project requirements.
+This platform serves as our designated repository for submitting our project work.
 ## Features
 Searching
 - 
