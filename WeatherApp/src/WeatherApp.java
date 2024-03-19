@@ -46,3 +46,51 @@ public class WeatherApp {
                 // read and store into the string builder
                 resultJson.append(scanner.nextLine());
             }
+// close scanner
+            scanner.close();
+
+            // close url connection
+            conn.disconnect();
+
+            // parse through our data
+            JSONParser parser = new JSONParser();
+            JSONObject resultJsonObj = (JSONObject) parser.parse(String.valueOf(resultJson));
+
+            // retrieve hourly data
+            JSONObject hourly = (JSONObject) resultJsonObj.get("hourly");
+
+            // we want to get the current hour's data
+            // so we need to get the index of our current hour
+            JSONArray time = (JSONArray) hourly.get("time");
+            int index = findIndexOfCurrentTime(time);
+
+            // get temperature
+            JSONArray temperatureData = (JSONArray) hourly.get("temperature_2m");
+            double temperature = (double) temperatureData.get(index);
+
+            // get weather code
+            JSONArray weathercode = (JSONArray) hourly.get("weathercode");
+            String weatherCondition = convertWeatherCode((long) weathercode.get(index));
+
+            // get humidity
+            JSONArray relativeHumidity = (JSONArray) hourly.get("relativehumidity_2m");
+            long humidity = (long) relativeHumidity.get(index);
+
+            // get windspeed
+            JSONArray windspeedData = (JSONArray) hourly.get("windspeed_10m");
+            double windspeed = (double) windspeedData.get(index);
+
+            // build the weather json data object that we are going to access in our frontend
+            JSONObject weatherData = new JSONObject();
+            weatherData.put("temperature", temperature);
+            weatherData.put("weather_condition", weatherCondition);
+            weatherData.put("humidity", humidity);
+            weatherData.put("windspeed", windspeed);
+
+            return weatherData;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return null;
+    }
