@@ -144,3 +144,53 @@ public class WeatherApp {
         // couldn't find location
         return null;
     }
+
+// Fetches API response 
+// Find the index of the current time.
+private static HttpURLConnection fetchApiResponse(String urlString){
+    try{
+        // attempt to create connection
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+        // set request method to get
+        conn.setRequestMethod("GET");
+
+        // connect to our API
+        conn.connect();
+        return conn;
+    }catch(IOException e){
+        e.printStackTrace();
+    }
+
+    // could not make connection
+    return null;
+}
+
+private static int findIndexOfCurrentTime(JSONArray timeList){
+    String currentTime = getCurrentTime();
+
+    // iterate through the time list and see which one matches our current time
+    for(int i = 0; i < timeList.size(); i++){
+        String time = (String) timeList.get(i);
+        if(time.equalsIgnoreCase(currentTime)){
+            // return the index
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+private static String getCurrentTime(){
+    // get current date and time
+    LocalDateTime currentDateTime = LocalDateTime.now();
+
+    // format date to be 2023-09-02T00:00 (this is how is is read in the API)
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH':00'");
+
+    // format and print the current date and time
+    String formattedDateTime = currentDateTime.format(formatter);
+
+    return formattedDateTime;
+}
