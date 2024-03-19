@@ -38,3 +38,11 @@ public class WeatherApp {
                 System.out.println("Error: Could not connect to API");
                 return null;
             }
+            
+                    // store resulting json data
+            StringBuilder resultJson = new StringBuilder();
+            Scanner scanner = new Scanner(conn.getInputStream());
+            while(scanner.hasNext()){
+                // read and store into the string builder
+                resultJson.append(scanner.nextLine());
+            }
