@@ -33,6 +33,7 @@ Go to the project directory
 - Abdul Ahad Tariq
 - Hammad Talat
 - Ahmed Moeez Azeem
+- Uzair Ahmad
 
 ## Feedback
 
