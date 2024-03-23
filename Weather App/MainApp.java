@@ -38,6 +38,20 @@ interface UserInterface {
     void displayLocationOptions(List<Location> locations);
 
     Location getLocationInput();
+    
+    int getMenuChoice();
+    Location getLocationInput();
+    List<Location> getLocationsByLatLngInput();
+    List<Location> getLocationsByCityInput();
+    void displayWeatherData(WeatherData data);
+    void displayLocationOptions(List<Location> locations);
+    void showCurrentWeather(WeatherService weatherService, UserInterface ui);
+    void showBasicInfo(WeatherService weatherService, UserInterface ui);
+    void showSunriseSunset(WeatherService weatherService, UserInterface ui);
+    void showWeatherForecast(WeatherService weatherService, UserInterface ui);
+    void showAirPollution(WeatherService weatherService, UserInterface ui);
+    void showPollutingGases(WeatherService weatherService, UserInterface ui);
+
 }
 
 interface Storage {
@@ -539,14 +553,81 @@ class TerminalUI implements UserInterface {
         return new Location(name, latitude, longitude);
     }
 
+   class TerminalUI implements UserInterface {
+    private final Scanner scanner = new Scanner(System.in);
+
+    @Override
     public int getMenuChoice() {
         System.out.println("\nWeather App Menu:");
-        System.out.println("  1. View Weather by Location");
-        System.out.println("  2. Manage Saved Locations");
-        System.out.println("  3. Exit");
+        System.out.println("  1. Show current weather conditions");
+        System.out.println("  2. Show basic information like 'Feels like, minimum and maximum temperature'");
+        System.out.println("  3. Show sunrise and sunset time");
+        System.out.println("  4. Show weather forecast for 5 days");
+        System.out.println("  5. Show Air Pollution data");
+        System.out.println("  6. Show data about polluting gases");
+        System.out.println("  7. Exit");
         System.out.print("Enter your choice: ");
         return scanner.nextInt();
     }
+
+    @Override
+    public Location getLocationInput() {
+        // Implement as required
+        return null;
+    }
+
+    @Override
+    public List<Location> getLocationsByLatLngInput() {
+        // Implement as required
+        return null;
+    }
+
+    @Override
+    public List<Location> getLocationsByCityInput() {
+        // Implement as required
+        return null;
+    }
+
+    @Override
+    public void displayWeatherData(WeatherData data) {
+        // Implement as required
+    }
+
+    @Override
+    public void displayLocationOptions(List<Location> locations) {
+        // Implement as required
+    }
+
+    @Override
+    public void showCurrentWeather(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
+    }
+
+    @Override
+    public void showBasicInfo(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
+    }
+
+    @Override
+    public void showSunriseSunset(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
+    }
+
+    @Override
+    public void showWeatherForecast(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
+    }
+
+    @Override
+    public void showAirPollution(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
+    }
+
+    @Override
+    public void showPollutingGases(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
+    }
+}
 }
 
 class FileStorage implements Storage {
@@ -699,24 +780,33 @@ public class MainApp {
         WeatherService weatherService = new WeatherServiceImpl(new OpenWeatherMapAPI()); // Replace with actual API
                                                                                          // implementation
 
+        List<Location> locationsByLatLng = ui.getLocationsByLatLngInput();
+
+        // Get multiple locations by city/country name
+        List<Location> locationsByCity = ui.getLocationsByCityInput();
+
         while (true) {
             int choice = ui.getMenuChoice();
             switch (choice) {
                 case 1:
-                    Location location = ui.getLocationInput() /* or display saved locations and get user choice */;
-                    try {
-                        WeatherData weatherData = weatherService.getWeatherData(location);
-                        ui.displayWeatherData(weatherData);
-                    } catch (Exception e) {
-                        System.err.println("Error fetching weather data: " + e.getMessage());
-                    }
+                    ui.showCurrentWeather(weatherService, ui);
                     break;
                 case 2:
-                    List<Location> locations = storage.getLocations();
-                    ui.displayLocationOptions(locations);
-                    // Add options to manage saved locations (add, remove, edit)
+                    ui.showBasicInfo(weatherService, ui);
                     break;
                 case 3:
+                    ui.showSunriseSunset(weatherService, ui);
+                    break;
+                case 4:
+                    ui.showWeatherForecast(weatherService, ui);
+                    break;
+                case 5:
+                    ui.showAirPollution(weatherService, ui);
+                    break;
+                case 6:
+                    ui.showPollutingGases(weatherService, ui);
+                    break;
+                case 7:
                     System.out.println("Exiting weather app.");
                     return;
                 default:
