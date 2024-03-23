@@ -295,6 +295,198 @@ class AirPollution {
     }
 }
 
+//TODO : Update class diagram and add these 6 classes
+// * My Api related classes
+class Coord {
+    public double lon;
+    public double lat;
+
+    public Coord() {
+        this.lon = 0.0; // Default longitude
+        this.lat = 0.0; // Default latitude
+    }
+
+    public Coord(double latitude, double longitude) {
+        this.lat = latitude;
+        this.lon = longitude;
+    }
+
+    public double getLatitude() {
+        return lat;
+    }
+
+    public double getLongitude() {
+        return lon;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                ", latitude=" + lat +
+                ", longitude=" + lon +
+                "}";
+    }
+}
+
+class Weather {
+    public int id;
+    public String main;
+    public String description;
+    public String icon;
+
+    public Weather() {
+        this.id = 0; // Default weather ID
+        this.main = ""; // Default main weather description
+        this.description = ""; // Default weather description
+        this.icon = ""; // Default weather icon code
+    }
+
+    public Weather(int id, String main, String description, String icon) {
+        this.id = id;
+        this.main = main;
+        this.description = description;
+        this.icon = icon;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getMain() {
+        return main;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+}
+
+class Main {
+    public double temp;
+    public double feels_like;
+    public double temp_min;
+    public double temp_max;
+    public int pressure;
+    public int humidity;
+
+    public Main() {
+        this.temp = 0.0; // Default temperature
+        this.feels_like = 0.0; // Default feels_like temperature
+        this.temp_min = 0.0; // Default minimum temperature
+        this.temp_max = 0.0; // Default maximum temperature
+        this.pressure = 0; // Default pressure
+        this.humidity = 0; // Default humidity
+    }
+
+    public Main(double temp, double feels_like, double temp_min, double temp_max, int pressure, int humidity) {
+        this.temp = temp;
+        this.feels_like = feels_like;
+        this.temp_min = temp_min;
+        this.temp_max = temp_max;
+        this.pressure = pressure;
+        this.humidity = humidity;
+    }
+
+    public double getTemp() {
+        return temp;
+    }
+
+    public double getFeelsLike() {
+        return feels_like;
+    }
+
+    public double getTempMin() {
+        return temp_min;
+    }
+
+    public double getTempMax() {
+        return temp_max;
+    }
+
+    public int getPressure() {
+        return pressure;
+    }
+
+    public int getHumidity() {
+        return humidity;
+    }
+}
+
+class Wind {
+    public double speed;
+    public int deg;
+    public double gust;
+
+    public Wind() {
+        this.speed = 0.0; // Default wind speed
+        this.deg = 0; // Default wind direction (degrees)
+        this.gust = 0.0; // Default wind gust speed
+    }
+
+    public Wind(double speed, int deg, double gust) {
+        this.speed = speed;
+        this.deg = deg;
+        this.gust = gust;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public int getDeg() {
+        return deg;
+    }
+
+    public double getGust() {
+        return gust;
+    }
+
+}
+
+class Clouds {
+    public int all;
+
+    public Clouds() {
+        this.all = 0; // Default cloud cover percentage
+    }
+
+    public Clouds(int all) {
+        this.all = all;
+    }
+
+    public int getAll() {
+        return all;
+    }
+}
+
+class Sys {
+    public int sunrise;
+    public int sunset;
+
+    public Sys() {
+        this.sunrise = 0; // Default sunrise time (seconds since epoch)
+        this.sunset = 0; // Default sunset time (seconds since epoch)
+    }
+
+    public Sys(int sunrise, int sunset) {
+        this.sunrise = sunrise;
+        this.sunset = sunset;
+    }
+
+    public int getSunrise() {
+        return sunrise;
+    }
+
+    public int getSunset() {
+        return sunset;
+    }
+
+}
 
 
 // * API logic ends here
