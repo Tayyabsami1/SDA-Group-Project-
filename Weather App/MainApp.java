@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/*This will only work in Intelije after you install 4
+/*ObjectMapper will only work in Intelije after you install 4
 dependencies in your PC and included in your project structure 
-the dependencies are mentioned in Readme file.
-*/
+the dependencies are mentioned in Readme file.*/
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.http.HttpRequest;
@@ -51,15 +50,176 @@ interface Storage {
     WeatherData getWeatherData(Location location);
 }
 
-
-// * API Logic starts here 
+// * API Logic starts here
 // https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&appid={yourownapikey}
 interface WeatherService {
     String getWeatherData(Coord location);
 }
 
+class WeatherServiceImpl implements WeatherService {
 
-// * API logic ends here 
+    private static String api;
+    WeatherData myweatherData;
+
+    public WeatherServiceImpl(String api) {
+        this.api = api;
+        myweatherData = new WeatherData();
+    }
+
+    @Override
+    public WeatherData getWeatherData(Coord location) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(api))
+                .header("X", "api.openweathermap.org")
+                .header("X-RapidAPI-Key", "yourApikey")
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = null;
+
+        try {
+
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        String res = response.body();
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            myweatherData = mapper.readValue(res, WeatherData.class);
+        }
+
+        catch (IOException e) {
+            System.out.println("fault is there");
+        }
+
+        return myweatherData;
+    }
+
+    // Sample main to test out the APi
+    public static void main(String[] args) {
+        WeatherServiceImpl myobj = new WeatherServiceImpl(
+                "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=2a8a0b0b17f5b1d25f15762b2fa658f4");
+
+        // Print statement to test
+        System.out.println("Working fine ");
+
+        Coord myloc = new Coord(0, 0);
+
+        WeatherData MyApiData = myobj.getWeatherData(myloc);
+
+        // ! If this gives the same output according to which the API was called your
+        // data is successfully stored
+        System.out.println(MyApiData.getCoord().getLatitude());
+
+    }
+}
+
+// * My API main class
+class WeatherData {
+
+    public Coord coord;
+    public List<Weather> weather;
+    public String base;
+    public Main main;
+    public int visibility;
+    public Wind wind;
+    public Clouds clouds;
+    public long dt;
+    public Sys sys;
+    public int timezone;
+    public int id;
+    public String name;
+    public int cod;
+
+    public WeatherData(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
+            Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
+        this.coord = coord;
+        this.weather = weather;
+        this.base = base;
+        this.main = main;
+        this.visibility = visibility;
+        this.wind = wind;
+        this.clouds = clouds;
+        this.dt = dt;
+        this.sys = sys;
+        this.timezone = timezone;
+        this.id = id;
+        this.name = name;
+        this.cod = cod;
+    }
+
+    public WeatherData() {
+        this.coord = new Coord();
+        this.visibility = 0;
+        this.dt = 0;
+        this.timezone = 0;
+        this.id = 0;
+        this.name = "";
+        this.cod = 0;
+    }
+
+    public Coord getCoord() {
+        return coord;
+    }
+
+    public List<Weather> getWeather() {
+        return weather;
+    }
+
+    public String getBase() {
+        return base;
+    }
+
+    public Main getMain() {
+        return main;
+    }
+
+    public int getVisibility() {
+        return visibility;
+    }
+
+    public Wind getWind() {
+        return wind;
+    }
+
+    public Clouds getClouds() {
+        return clouds;
+    }
+
+    public long getDt() {
+        return dt;
+    }
+
+    public Sys getSys() {
+        return sys;
+    }
+
+    public int getTimezone() {
+        return timezone;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getCod() {
+        return cod;
+    }
+
+}
+
+// * API logic ends here
 
 class TerminalUI implements UserInterface {
 
@@ -189,7 +349,8 @@ class DatabaseStorage implements Storage {
     @Override
     public void saveLocation(Location location) {
         String sql = "INSERT INTO locations (name, latitude, longitude) VALUES (?, ?, ?)";
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, location.getName());
             statement.setDouble(2, location.getLatitude());
             statement.setDouble(3, location.getLongitude());
@@ -203,7 +364,8 @@ class DatabaseStorage implements Storage {
     public List<Location> getLocations() {
         List<Location> locations = new ArrayList<>();
         String sql = "SELECT name, latitude, longitude FROM locations";
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 String name = resultSet.getString(1);
@@ -257,9 +419,8 @@ class Notification {
     }
 }
 
-
-// Changing the Name of the start point  
-// ! Also changed the name of the file so that it runs 
+// Changing the Name of the start point
+// ! Also changed the name of the file so that it runs
 public class MainApp {
 
     public static void main(String[] args) {
