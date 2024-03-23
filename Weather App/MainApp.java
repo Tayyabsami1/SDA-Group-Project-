@@ -121,6 +121,7 @@ class WeatherServiceImpl implements WeatherService {
     }
 }
 
+//TODO : Update class diagram accordingly 
 // * My API main class
 class WeatherData {
 
@@ -218,6 +219,83 @@ class WeatherData {
     }
 
 }
+
+// Ahad class
+class CurrentWeather {
+    private final double temperature;
+    private final double feelsLike;
+    private final double minTemp;
+    private final double maxTemp;
+    private final String sunrise;
+    private final String sunset;
+    private final String timestamp;
+
+    public CurrentWeather(double temperature, double feelsLike, double minTemp, double maxTemp, String sunrise,
+            String sunset, String timestamp) {
+        this.temperature = temperature;
+        this.feelsLike = feelsLike;
+        this.minTemp = minTemp;
+        this.maxTemp = maxTemp;
+        this.sunrise = sunrise;
+        this.sunset = sunset;
+        this.timestamp = timestamp;
+    }
+
+    // Getters for all attributes
+}
+
+// Ahad class
+class BasicInfo {
+    private final double feelsLike;
+    private final double minTemp;
+    private final double maxTemp;
+    private final String timestamp;
+
+    public BasicInfo(double feelsLike, double minTemp, double maxTemp, String timestamp) {
+        this.feelsLike = feelsLike;
+        this.minTemp = minTemp;
+        this.maxTemp = maxTemp;
+        this.timestamp = timestamp;
+    }
+
+    // Getters for all attributes
+}
+
+// Ahad Class
+class Forecast {
+    private final String date;
+    private final double temperature;
+    private final String timestamp;
+
+    public Forecast(String date, double temperature, String timestamp) {
+        this.date = date;
+        this.temperature = temperature;
+        this.timestamp = timestamp;
+    }
+
+    // Getters for all attributes
+}
+
+// Ahad class
+class AirPollution {
+    private final int aqi;
+    private final Map<String, Double> pollutants;
+    private final String timestamp;
+
+    public AirPollution(int aqi, Map<String, Double> pollutants, String timestamp) {
+        this.aqi = aqi;
+        this.pollutants = pollutants;
+        this.timestamp = timestamp;
+    }
+
+    // Getters for all attributes
+
+    public double getPollutantLevel(String pollutantName) {
+        return pollutants.getOrDefault(pollutantName, 0.0);
+    }
+}
+
+
 
 // * API logic ends here
 
