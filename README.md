@@ -37,4 +37,4 @@ Go to the project directory
 
 ## Feedback
 
-If you have any feedback, please reach out to us at tayyabsammy1@gmail.com, abdulahadg2004@gmail.com, azeemmoeez5@gmail.com
+If you have any feedback, please reach out to us at tayyabsammy1@gmail.com, hassnainidrees@gmail.com, abdulahadg2004@gmail.com, azeemmoeez5@gmail.com
