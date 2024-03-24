@@ -491,7 +491,7 @@ class City {
 }
 
 // TODO : Update class diagram and add these 6 classes
-// * My Api related classes
+// * My Api related classes 
 class Coord {
     public double lon;
     public double lat;
@@ -568,6 +568,9 @@ class Main {
     public double temp_max;
     public int pressure;
     public int humidity;
+    public int sea_level;
+    public int grnd_level;
+    public int temp_kf;
 
     public Main() {
         this.temp = 0.0; // Default temperature
@@ -576,15 +579,22 @@ class Main {
         this.temp_max = 0.0; // Default maximum temperature
         this.pressure = 0; // Default pressure
         this.humidity = 0; // Default humidity
+        this.sea_level = 0;
+        this.grnd_level = 0;
+        this.temp_kf=0;
     }
 
-    public Main(double temp, double feels_like, double temp_min, double temp_max, int pressure, int humidity) {
+    public Main(double temp, double feels_like, double temp_min, double temp_max, int pressure, int humidity,
+            int sea_level, int grnd_level,int temp_kf) {
         this.temp = temp;
         this.feels_like = feels_like;
         this.temp_min = temp_min;
         this.temp_max = temp_max;
         this.pressure = pressure;
         this.humidity = humidity;
+        this.sea_level = sea_level;
+        this.grnd_level = grnd_level;
+        this.temp_kf=temp_kf;
     }
 
     public double getTemp() {
@@ -662,6 +672,7 @@ class Clouds {
 class Sys {
     public int sunrise;
     public int sunset;
+    public String pod;
 
     public Sys() {
         this.sunrise = 0; // Default sunrise time (seconds since epoch)
@@ -682,6 +693,7 @@ class Sys {
     }
 
 }
+
 
 // * API logic ends here
 
