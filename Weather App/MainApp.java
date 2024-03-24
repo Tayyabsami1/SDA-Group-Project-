@@ -32,6 +32,18 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+
+//for File
+import java.io.IOException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.io.LineNumberReader;
+import java.io.FileNotFoundException;
+
 interface UserInterface {
     void displayWeatherData(WeatherData data);
 
@@ -41,21 +53,16 @@ interface UserInterface {
 
     int getMenuChoice();
 
-    Location getLocationInput();
 
-    List<Location> getLocationsByLatLngInput();
+    // List<Location> getLocationsByLatLngInput();
 
-    List<Location> getLocationsByCityInput();
-
-    void displayWeatherData(WeatherData data);
-
-    void displayLocationOptions(List<Location> locations);
+    // List<Location> getLocationsByCityInput();
 
     void showCurrentWeather(WeatherService weatherService, UserInterface ui);
 
-    void showBasicInfo(WeatherService weatherService, UserInterface ui);
+    void showBasicInfo(WeatherService weatherService, Location location,Storage storage);
 
-    void showSunriseSunset(WeatherService weatherService, UserInterface ui);
+    void showSunriseSunset(WeatherService weatherService,Location location,Storage storage);
 
     void showWeatherForecast(WeatherService weatherService, UserInterface ui);
 
@@ -73,13 +80,15 @@ interface Storage {
     void saveWeatherData(Location location, WeatherData data);
 
     WeatherData getWeatherData(Location location);
+    void saveBasicInfo(Location location, double fl,double Tmin, double Tmax);
+    boolean checkBasicInfo(Location location);
 }
 
 // * API Logic starts here
 // https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&appid={yourownapikey}
 interface WeatherService {
     // Get Normal Weather Data
-    String getWeatherData(Coord location);
+    WeatherData getWeatherData(Coord location);
 
     // Get Forecast for 5 next days
     Forecast getForecastData(Coord location);
@@ -283,7 +292,6 @@ class WeatherData {
     }
 
 }
-
 // *Modified Forecast class to use it as my Api data store to store forecast data 
 class Forecast {
     public int cod;
@@ -570,6 +578,8 @@ class Main {
     public int sea_level;
     public int grnd_level;
     public int temp_kf;
+    public String location;
+    public String date;
 
     public Main() {
         this.temp = 0.0; // Default temperature
@@ -599,7 +609,35 @@ class Main {
     public double getTemp() {
         return temp;
     }
+    public  void setFeelsike(double fl)
+    {
+        feels_like=fl;
+    }
+    public  void setTemp_Min(double fl)
+    {
+        temp_min=fl;
+    }
+    public  void setTemp_Max(double fl)
+    {
+        temp_max=fl;
+    }
+    public  void setLocation(String l)
+    {
+        location=l;
+    }
+    public  void setDate(String d)
+    {
+        date=d;
+    }
 
+    public String getLocation()
+    {
+        return location;
+    }
+    public String getDate()
+    {
+        return date;
+    }
     public double getFeelsLike() {
         return feels_like;
     }
@@ -696,23 +734,22 @@ class Sys {
 // * API logic ends here
 
 class TerminalUI implements UserInterface {
-
     private final Scanner scanner = new Scanner(System.in);
 
     @Override
     public void displayWeatherData(WeatherData data) {
-        System.out.println("Current Weather for " + data.getCurrentWeather().getTimestamp() + ":");
-        System.out.println("  Temperature: " + data.getCurrentWeather().getTemperature() + "°C");
-        System.out.println("  Feels Like: " + data.getCurrentWeather().getFeelsLike() + "°C");
-        System.out.println("  Min Temp: " + data.getBasicInfo().getMinTemp() + "°C");
-        System.out.println("  Max Temp: " + data.getBasicInfo().getMaxTemp() + "°C");
-        System.out.println("  Sunrise: " + data.getCurrentWeather().getSunrise());
-        System.out.println("  Sunset: " + data.getCurrentWeather().getSunset());
-        System.out.println("  Forecast:");
-        for (Forecast forecast : data.getForecast()) {
-            System.out.println("    - " + forecast.getDate() + ": " + forecast.getTemperature() + "°C");
-        }
-        System.out.println("  Air Quality Index (AQI): " + data.getAirPollution().getAqi());
+        // System.out.println("Current Weather for " + data.getCurrentWeather().getTimestamp() + ":");
+        // System.out.println("  Temperature: " + data.getCurrentWeather().getTemperature() + "°C");
+        // System.out.println("  Feels Like: " + data.getCurrentWeather().getFeelsLike() + "°C");
+        // System.out.println("  Min Temp: " + data.getBasicInfo().getMinTemp() + "°C");
+        // System.out.println("  Max Temp: " + data.getBasicInfo().getMaxTemp() + "°C");
+        // System.out.println("  Sunrise: " + data.getCurrentWeather().getSunrise());
+        // System.out.println("  Sunset: " + data.getCurrentWeather().getSunset());
+        // System.out.println("  Forecast:");
+        // for (Forecast forecast : data.getForecast()) {
+        //     System.out.println("    - " + forecast.getDate() + ": " + forecast.getTemperature() + "°C");
+        // }
+        // System.out.println("  Air Quality Index (AQI): " + data.getAirPollution().getAqi());
     }
 
     @Override
@@ -743,93 +780,194 @@ class TerminalUI implements UserInterface {
         return new Location(name, latitude, longitude);
     }
 
-    class TerminalUI implements UserInterface {
-        private final Scanner scanner = new Scanner(System.in);
+    @Override
+    public int getMenuChoice() {
+        System.out.println("\nWeather App Menu:");
+        System.out.println("  1. Show current weather conditions");
+        System.out.println("  2. Show basic information like 'Feels like, minimum and maximum temperature'");
+        System.out.println("  3. Show sunrise and sunset time");
+        System.out.println("  4. Show weather forecast for 5 days");
+        System.out.println("  5. Show Air Pollution data");
+        System.out.println("  6. Show data about polluting gases");
+        System.out.println("  7. Exit");
+        System.out.print("Enter your choice: ");
+        return scanner.nextInt();
+    }
+    // @Override
+    // public List<Location> getLocationsByLatLngInput() {
+    //     // Implement as required
+    //     return null;
+    // }
 
-        @Override
-        public int getMenuChoice() {
-            System.out.println("\nWeather App Menu:");
-            System.out.println("  1. Show current weather conditions");
-            System.out.println("  2. Show basic information like 'Feels like, minimum and maximum temperature'");
-            System.out.println("  3. Show sunrise and sunset time");
-            System.out.println("  4. Show weather forecast for 5 days");
-            System.out.println("  5. Show Air Pollution data");
-            System.out.println("  6. Show data about polluting gases");
-            System.out.println("  7. Exit");
-            System.out.print("Enter your choice: ");
-            return scanner.nextInt();
-        }
+    // @Override
+    // public List<Location> getLocationsByCityInput() {
+    //     // Implement as required
+    //     return null;
+    // }
 
-        @Override
-        public Location getLocationInput() {
-            // Implement as required
-            return null;
-        }
 
-        @Override
-        public List<Location> getLocationsByLatLngInput() {
-            // Implement as required
-            return null;
-        }
+    @Override
+    public void showCurrentWeather(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
+    }
 
-        @Override
-        public List<Location> getLocationsByCityInput() {
-            // Implement as required
-            return null;
-        }
+    @Override
+    public void showBasicInfo(WeatherService weatherService, Location location,Storage storage) {
+        // Implement as required
+        double feels_like;
+        double temp_min;
+        double temp_max;
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        WeatherData Data = weatherService.getWeatherData(myloc);
+        feels_like=Data.getMain().getFeelsLike();
+        temp_min=Data.getMain().getTempMin();
+        temp_max=Data.getMain().getTempMax();
+        System.out.println("Feels Like: "+feels_like+"\n Minimum Temperature: "+temp_min+"Maximum Temperature: "+temp_max);
+        storage.saveBasicInfo(location, feels_like, temp_min, temp_max);
+    }
 
-        @Override
-        public void displayWeatherData(WeatherData data) {
-            // Implement as required
-        }
+    @Override
+    public void showSunriseSunset(WeatherService weatherService,Location location,Storage storage) {
+        // Implement as required
+    }
 
-        @Override
-        public void displayLocationOptions(List<Location> locations) {
-            // Implement as required
-        }
+    @Override
+    public void showWeatherForecast(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
+    }
 
-        @Override
-        public void showCurrentWeather(WeatherService weatherService, UserInterface ui) {
-            // Implement as required
-        }
+    @Override
+    public void showAirPollution(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
+    }
 
-        @Override
-        public void showBasicInfo(WeatherService weatherService, UserInterface ui) {
-            // Implement as required
-        }
-
-        @Override
-        public void showSunriseSunset(WeatherService weatherService, UserInterface ui) {
-            // Implement as required
-        }
-
-        @Override
-        public void showWeatherForecast(WeatherService weatherService, UserInterface ui) {
-            // Implement as required
-        }
-
-        @Override
-        public void showAirPollution(WeatherService weatherService, UserInterface ui) {
-            // Implement as required
-        }
-
-        @Override
-        public void showPollutingGases(WeatherService weatherService, UserInterface ui) {
-            // Implement as required
-        }
+    @Override
+    public void showPollutingGases(WeatherService weatherService, UserInterface ui) {
+        // Implement as required
     }
 }
+class Location {
+    private final String name;
+    private final double latitude;
+    private final double longitude;
 
-class FileStorage implements Storage {
-
-    private final String storageFile;
-    private final ObjectMapper objectMapper;
-
-    public FileStorage(String storageFile) {
-        this.storageFile = storageFile;
-        this.objectMapper = new ObjectMapper();
+    public Location(String name, double latitude, double longitude) {
+        this.name = name;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "name='" + name + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
+}
+class FileStorage implements Storage {
+
+    
+    @Override
+    public void saveBasicInfo(Location location, double fl,double Tmin, double Tmax)
+    {
+        try {
+
+            File myFile = new File("BasicInfo.txt");
+            FileWriter writer = new FileWriter(myFile,true);
+            LocalDate today = LocalDate.now();
+            writer.write(location.getName());
+            writer.write(",");
+            writer.write(String.valueOf(fl));
+            writer.write(",");
+            writer.write(String.valueOf(Tmin));
+            writer.write(",");
+            writer.write(String.valueOf(Tmax));
+            writer.write(",");
+            writer.write(String.valueOf(today));
+            writer.write("\n");
+            writer.close();
+        } 
+          catch (IOException e) 
+          {
+            System.err.println("Error writing to file: " + e.getMessage());
+          }
+    }
+
+    @Override
+    public boolean checkBasicInfo(Location location)
+    {
+        String delimiter = ",";  // Word to stop reading
+        int numberOfLines = 0;
+        LocalDate today = LocalDate.now();
+        boolean check=false;
+       try{
+            LineNumberReader reader = new LineNumberReader(new FileReader("BasicInfo.txt"));
+            while (reader.readLine() != null) {
+                numberOfLines++;
+            }
+            reader.close();
+            
+        }
+            catch (IOException e) {
+                System.err.println("Error reading file: " + e.getMessage());
+            }
+            Main[] arr= new Main[numberOfLines];
+       try{
+          Scanner scanner = new Scanner(new File("BasicInfo.txt"));
+          scanner.useDelimiter(delimiter);  // Set delimiter for splitting
+    
+          for( int i=0;i<arr.length;i++)
+          {
+            arr[i] = new Main();
+              arr[i].setLocation(scanner.next());
+              arr[i].setFeelsike(Double.parseDouble(scanner.next()));
+              arr[i].setTemp_Min(Double.parseDouble(scanner.next()));
+              arr[i].setTemp_Max(Double.parseDouble(scanner.next()));
+              String firstLine = scanner.nextLine();
+              arr[i].setDate(firstLine.substring(1));
+
+          }
+          scanner.close();
+        }
+          catch (FileNotFoundException e) {
+            System.err.println("Error opening file:  " + e.getMessage());
+        }
+        int index=0;
+        for(int i=0;i<arr.length;i++)
+        {
+            
+            if(arr[i].getLocation().equalsIgnoreCase(location.getName()))
+            {
+                if(arr[i].getDate().equals(String.valueOf(today)))
+                {
+                    check=true;
+                    index=i;
+
+                }
+            }
+        }
+        if(check==false)
+        {
+            return false;
+        }
+        System.out.println("Feels Like: "+arr[index].getFeelsLike()+"\n Minimum Temperature: "+arr[index].getTempMin()+"Maximum Temperature: "+arr[index].getTempMax());
+        return true;
+          
+    }
     @Override
     public void saveLocation(Location location) {
         List<Location> locations = getLocations();
@@ -870,6 +1008,7 @@ class FileStorage implements Storage {
         }
     }
 }
+
 
 class DatabaseStorage implements Storage {
 
@@ -960,21 +1099,23 @@ class Notification {
     }
 }
 
-// Changing the Name of the start point
+/ Changing the Name of the start point
 // ! Also changed the name of the file so that it runs
-public class MainApp {
+class MainApp {
 
     public static void main(String[] args) {
         UserInterface ui = new TerminalUI();
-        Storage storage = new FileStorage("locations.json");
-        WeatherService weatherService = new WeatherServiceImpl(new OpenWeatherMapAPI()); // Replace with actual API
+        Storage storage = new FileStorage();
+        WeatherService weatherService = new WeatherServiceImpl(
+        "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=yourapikey"); // Replace with actual API
                                                                                          // implementation
 
-        List<Location> locationsByLatLng = ui.getLocationsByLatLngInput();
+        // List<Location> locationsByLatLng = ui.getLocationsByLatLngInput();
 
-        // Get multiple locations by city/country name
-        List<Location> locationsByCity = ui.getLocationsByCityInput();
+        // // Get multiple locations by city/country name
+        // List<Location> locationsByCity = ui.getLocationsByCityInput();
 
+        Location location=ui.getLocationInput();
         while (true) {
             int choice = ui.getMenuChoice();
             switch (choice) {
@@ -982,11 +1123,23 @@ public class MainApp {
                     ui.showCurrentWeather(weatherService, ui);
                     break;
                 case 2:
-                    ui.showBasicInfo(weatherService, ui);
+                {
+                    boolean check=storage.checkBasicInfo(location);
+                    if(check==false)
+                    {
+                    ui.showBasicInfo(weatherService,location,storage );
+                    }
                     break;
+                }
                 case 3:
-                    ui.showSunriseSunset(weatherService, ui);
+                {
+                    boolean check=storage.checkBasicInfo(location);
+                    if(check==false)
+                    {
+                    ui.showSunriseSunset(weatherService,location,storage);
+                    }
                     break;
+               }
                 case 4:
                     ui.showWeatherForecast(weatherService, ui);
                     break;
@@ -1005,6 +1158,7 @@ public class MainApp {
         }
     }
 }
+
 
 class JavaFXUI extends Application implements UserInterface {
 
