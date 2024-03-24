@@ -47,8 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 interface UserInterface {
-    void displayWeatherData(WeatherData data);
-
+   
     void displayLocationOptions(List<Location> locations);
 
     Location getLocationInput();
@@ -68,9 +67,9 @@ interface UserInterface {
 
     void showWeatherForecast(WeatherService weatherService, UserInterface ui);
 
-    void showAirPollution(WeatherService weatherService, UserInterface ui);
+    void showAirPollution(WeatherService weatherService,Location location,Storage storage);
 
-    void showPollutingGases(WeatherService weatherService, UserInterface ui);
+    void showPollutingGases(WeatherService weatherService,Location location,Storage storage);
 
 }
 
@@ -79,17 +78,17 @@ interface Storage {
 
     List<Location> getLocations();
 
-    void saveWeatherData(Location location, WeatherData data);
-
-    WeatherData getWeatherData(Location location);
     void saveBasicInfo(Location location, double fl,double Tmin, double Tmax);
     boolean checkBasicInfo(Location location);
     void saveSunInfo(Location location, String SunR, String SunS);
     boolean checkSunInfo(Location location);
     void saveCurrentInfo(Location location, String main,String  description,double temp, int pressure, int humidity,double speed);
     boolean checkCurrentInfo(Location location);
-}
+   void saveAirPollution(Location location,int aqi,AirQuality object);
+   boolean checkAirPollution(Location location);
+   boolean checkPollutingGases(Location location);
 
+}
 // * API Logic starts here
 // https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&appid={yourownapikey}
 // http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={APIkey}
@@ -502,6 +501,8 @@ class AirQuality {
 class AirIndex {
 
     public int aqi;
+    public String location;
+    public String date;
 
     public AirIndex()
     {
@@ -511,9 +512,28 @@ class AirIndex {
     public AirIndex(int aqi) {
         this.aqi = aqi;
     }
-
-    int getAqi() {
+    public void setaqi(int a)
+    {
+        aqi=a;
+    }
+    public int getAqi() {
         return this.aqi;
+    }
+    public  void setLocation(String l)
+    {
+        location=l;
+    }
+    public  void setDate(String d)
+    {
+        date=d;
+    }
+    public String getLocation()
+    {
+        return location;
+    }
+    public String getDate()
+    {
+        return date;
     }
 }
 
@@ -578,6 +598,37 @@ class Components {
 
     public double getNh3() {
         return nh3;
+    }
+    public void setCo(double c) {
+        co=c;
+    }
+
+    public void setNo(double c) {
+        no=c;
+    }
+
+    public void setNo2(double c) {
+         no2=c;
+    }
+
+    public void setO3(double c) {
+         o3=c;
+    }
+
+    public void setSo2(double c) {
+         so2=c;
+    }
+
+    public void setPm2_5(double c) {
+         pm2_5=c;
+    }
+
+    public void setPm10(double c) {
+         pm10=c;
+    }
+
+    public void setNh3(double c) {
+         nh3=c;
     }
 }
 
@@ -870,22 +921,6 @@ class TerminalUI implements UserInterface {
     private final Scanner scanner = new Scanner(System.in);
 
     @Override
-    public void displayWeatherData(WeatherData data) {
-        // System.out.println("Current Weather for " + data.getCurrentWeather().getTimestamp() + ":");
-        // System.out.println("  Temperature: " + data.getCurrentWeather().getTemperature() + "°C");
-        // System.out.println("  Feels Like: " + data.getCurrentWeather().getFeelsLike() + "°C");
-        // System.out.println("  Min Temp: " + data.getBasicInfo().getMinTemp() + "°C");
-        // System.out.println("  Max Temp: " + data.getBasicInfo().getMaxTemp() + "°C");
-        // System.out.println("  Sunrise: " + data.getCurrentWeather().getSunrise());
-        // System.out.println("  Sunset: " + data.getCurrentWeather().getSunset());
-        // System.out.println("  Forecast:");
-        // for (Forecast forecast : data.getForecast()) {
-        //     System.out.println("    - " + forecast.getDate() + ": " + forecast.getTemperature() + "°C");
-        // }
-        // System.out.println("  Air Quality Index (AQI): " + data.getAirPollution().getAqi());
-    }
-
-    @Override
     public void displayLocationOptions(List<Location> locations) {
         if (locations.isEmpty()) {
             System.out.println("No saved locations found.");
@@ -955,11 +990,8 @@ class TerminalUI implements UserInterface {
         pressure=Data.getMain().getPressure();
         humidity=Data.getMain().getHumidity();
         speed=Data.getWind().getSpeed();
-        List<Weather> list=Data.getWeather();
-        for (Weather weather : list) {
-            main = weather.getMain();
-            description = weather.getDescription();
-        }
+        main =Data.getWeather().get(0).getMain();
+        description=Data.getWeather().get(0).getDescription();
         System.out.println("Weather: "+main+"\nDescription: "+description+"\nTemperature: "+temp+
         "\nPressure: "+pressure+"Humidity: "+humidity+"\nWind Speed: "+speed);
         storage.saveCurrentInfo(location, main, description, temp,pressure,humidity,speed);
@@ -1008,13 +1040,27 @@ class TerminalUI implements UserInterface {
     }
 
     @Override
-    public void showAirPollution(WeatherService weatherService, UserInterface ui) {
+    public void showAirPollution(WeatherService weatherService,Location location,Storage storage) {
         // Implement as required
+        
+    Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+    AirPollution MyPollutionData=weatherService.getPollutionData(myloc);
+    int aqi=MyPollutionData.getList().get(0).getMain().getAqi();
+    System.out.println("Air pollution Data: "+"\n\nAir Quality Index: "+aqi);
+    storage.saveAirPollution(location,aqi,MyPollutionData.getList().get(0));
     }
 
     @Override
-    public void showPollutingGases(WeatherService weatherService, UserInterface ui) {
+    public void showPollutingGases(WeatherService weatherService,Location location,Storage storage) {
         // Implement as required
+    Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+    AirPollution MyPollutionData=weatherService.getPollutionData(myloc);
+    AirQuality object=MyPollutionData.getList().get(0);
+    int aqi=MyPollutionData.getList().get(0).getMain().getAqi();
+    System.out.println("Deatails Of Polluting Gases: \nCO: "+object.getComponents().getCo()+"\nNO: "+object.getComponents().getNo()+"\nNO2: "+object.getComponents().getNo2()+
+    "\nO3: "+object.getComponents().getO3()+"\nSO2: "+object.getComponents().getSo2()+"\nPM2_5: "+object.getComponents().getPm2_5()+
+    "\nPM10: "+object.getComponents().getPm10()+"\nNH3: "+object.getComponents().getNh3());
+    storage.saveAirPollution(location,aqi,MyPollutionData.getList().get(0));
     }
 }
 class Location {
@@ -1052,7 +1098,178 @@ class Location {
 
 class FileStorage implements Storage {
 
+    //same function for air pollution data and air pollution gases data
+    @Override
+    public void saveAirPollution(Location location,int aqi,AirQuality object)
+    {
+        try {
+
+            File myFile = new File("AirPollution.txt");
+            FileWriter writer = new FileWriter(myFile,true);
+            LocalDate today = LocalDate.now();
+            writer.write(location.getName());
+            writer.write(",");
+            writer.write(String.valueOf(aqi));
+            writer.write(",");
+            writer.write(String.valueOf(today));
+            writer.write(",");
+            writer.write(String.valueOf(object.getComponents().getCo()));
+            writer.write(",");
+            writer.write(String.valueOf(object.getComponents().getNo()));
+            writer.write(",");
+            writer.write(String.valueOf(object.getComponents().getNo2()));
+            writer.write(",");
+            writer.write(String.valueOf(object.getComponents().getO3()));
+            writer.write(",");
+            writer.write(String.valueOf(object.getComponents().getSo2()));
+            writer.write(",");
+            writer.write(String.valueOf(object.getComponents().getPm2_5()));
+            writer.write(",");
+            writer.write(String.valueOf(object.getComponents().getPm10()));
+            writer.write(",");
+            writer.write(String.valueOf(object.getComponents().getNh3()));
+            writer.write("\n");
+            writer.close();
+        } 
+          catch (IOException e) 
+          {
+            System.err.println("Error writing to file: " + e.getMessage());
+          }
     
+
+    }
+    @Override
+   public boolean checkAirPollution(Location location)
+   {
+    //function to check existing data in file
+    String delimiter = ",";  // Word to stop reading
+    int numberOfLines = 0;
+    LocalDate today = LocalDate.now();
+    boolean check=false;
+   try{
+        LineNumberReader reader = new LineNumberReader(new FileReader("AirPollution.txt"));
+        while (reader.readLine() != null) {
+            numberOfLines++;
+        }
+        reader.close();
+        
+    }
+        catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        }
+        AirIndex[] arr= new AirIndex[numberOfLines];
+   try{
+      Scanner scanner = new Scanner(new File("AirPollution.txt"));
+      scanner.useDelimiter(delimiter);  // Set delimiter for splitting
+
+      for( int i=0;i<arr.length;i++)
+      {
+        arr[i] = new AirIndex();
+          arr[i].setLocation(scanner.next());
+          arr[i].setaqi(Integer.parseInt(scanner.next()));
+          arr[i].setDate(scanner.next());
+          String firstLine = scanner.nextLine();
+
+      }
+      scanner.close();
+    }
+      catch (FileNotFoundException e) {
+        System.err.println("Error opening file:  " + e.getMessage());
+    }
+    int index=0;
+    for(int i=0;i<arr.length;i++)
+    {
+        
+        if(arr[i].getLocation().equalsIgnoreCase(location.getName()))
+        {
+            if(arr[i].getDate().equals(String.valueOf(today)))
+            {
+                check=true;
+                index=i;
+
+            }
+        }
+    }
+    if(check==false)
+    {
+        return false;
+    }
+    System.out.println("Air Pollution Data: \nAir Quality Index: "+arr[index].getAqi());
+    return true;
+   
+   }
+   @Override
+   public boolean checkPollutingGases(Location location)
+   {
+    String delimiter = ",";  // Word to stop reading
+    int numberOfLines = 0;
+    LocalDate today = LocalDate.now();
+    boolean check=false;
+   try{
+        LineNumberReader reader = new LineNumberReader(new FileReader("AirPollution.txt"));
+        while (reader.readLine() != null) {
+            numberOfLines++;
+        }
+        reader.close();
+        
+    }
+        catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        }
+        AirIndex[] arr= new AirIndex[numberOfLines];
+        Components[] arr1= new Components[numberOfLines];
+   try{
+      Scanner scanner = new Scanner(new File("AirPollution.txt"));
+      scanner.useDelimiter(delimiter);  // Set delimiter for splitting
+
+      for( int i=0;i<arr.length;i++)
+      {
+        arr[i] = new AirIndex();
+        arr1[i] = new Components();
+          arr[i].setLocation(scanner.next());
+          arr[i].setaqi(Integer.parseInt(scanner.next()));
+          arr[i].setDate(scanner.next());
+          arr1[i].setCo(Double.parseDouble(scanner.next()));
+          arr1[i].setNo(Double.parseDouble(scanner.next()));
+          arr1[i].setNo2(Double.parseDouble(scanner.next()));
+          arr1[i].setO3(Double.parseDouble(scanner.next()));
+          arr1[i].setSo2(Double.parseDouble(scanner.next()));
+          arr1[i].setPm2_5(Double.parseDouble(scanner.next()));
+          arr1[i].setPm10(Double.parseDouble(scanner.next()));
+          String firstLine = scanner.nextLine();
+          arr1[i].setNh3(Double.parseDouble(firstLine.substring(1)));
+      }
+      scanner.close();
+    }
+      catch (FileNotFoundException e) {
+        System.err.println("Error opening file:  " + e.getMessage());
+    }
+    int index=0;
+    for(int i=0;i<arr.length;i++)
+    {
+        
+        if(arr[i].getLocation().equalsIgnoreCase(location.getName()))
+        {
+            if(arr[i].getDate().equals(String.valueOf(today)))
+            {
+                check=true;
+                index=i;
+
+            }
+        }
+    }
+    if(check==false)
+    {
+        return false;
+    }
+    System.out.println("Deatails Of Polluting Gases: \nCO: "+arr1[index].getCo()+"\nNO: "+arr1[index].getNo()+"\nNO2: "+arr1[index].getNo2()+
+        "\nO3: "+arr1[index].getO3()+"\nSO2: "+arr1[index].getSo2()+"\nPM2_5: "+arr1[index].getPm2_5()+
+        "\nPM10: "+arr1[index].getPm10()+"\nNH3: "+arr1[index].getNh3());
+    return true;
+   
+
+   }
+
     @Override
     public void saveBasicInfo(Location location, double fl,double Tmin, double Tmax)
     {
@@ -1328,32 +1545,17 @@ class FileStorage implements Storage {
         "\nPressure: "+arr[index].getPressure()+"\nHumidity: "+arr[index].getHumidity()+"\nSpeed: "+arr2[index].getSpeed());
         return true;
     }
-
     @Override
     public void saveWeatherData(Location location, WeatherData data) {
         // Not implemented in this example, could store weather data per location
     }
 
     @Override
-    public WeatherData getWeatherData(Location location) {
-        // Not implemented in this example, could retrieve cached weather data
-        return null;
-    }
-
-    private void writeLocationsToFile(List<Location> locations) {
-        try {
-            objectMapper.writeValue(new File(storageFile), locations);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    @Override
     public void saveLocation(Location location) {
         List<Location> locations = getLocations();
         locations.add(location);
         writeLocationsToFile(locations);
     }
-
     @Override
     public List<Location> getLocations() {
         File file = new File(storageFile);
@@ -1418,18 +1620,7 @@ class DatabaseStorage implements Storage {
         return locations;
     }
 
-    // Not implemented in this example, could store weather data per location
-    @Override
-    public void saveWeatherData(Location location, WeatherData data) {
-        // ... (implement saving weather data to the database)
-    }
-
-    // Not implemented in this example, could retrieve cached weather data
-    @Override
-    public WeatherData getWeatherData(Location location) {
-        // ... (implement retrieving weather data from the database)
-        return null;
-    }
+    
 }
 
 class Notification {
@@ -1509,11 +1700,22 @@ class MainApp {
                     ui.showWeatherForecast(weatherService, ui);
                     break;
                 case 5:
-                    ui.showAirPollution(weatherService, ui);
+                {
+                    boolean check=storage.checkAirPollution(location);
+                    if(check==false)
+                    {
+                    ui.showAirPollution(weatherService,location,storage);
+                    }
                     break;
-                case 6:
-                    ui.showPollutingGases(weatherService, ui);
+               }
+                case 6: {
+                    boolean check=storage.checkPollutingGases(location);
+                    if(check==false)
+                    {
+                    ui.showPollutingGases(weatherService,location,storage);
+                    }
                     break;
+               }
                 case 7:
                     System.out.println("Exiting weather app.");
                     return;
