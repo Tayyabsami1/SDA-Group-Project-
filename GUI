@@ -1,1 +1,106 @@
+class Main extends JFrame {
+    private static final int IMAGE_WIDTH = 720;
+    private static final int IMAGE_HEIGHT = 1280;
 
+    private BasicInfo basicInfo;
+    private ShowWeather showWeather; // Declare ShowWeather instance
+
+    public Main() {
+        setTitle("Weather App");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(IMAGE_WIDTH, IMAGE_HEIGHT);
+        setLocationRelativeTo(null);
+
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg");
+        JLabel backgroundLabel = new JLabel(backgroundImage);
+        backgroundLabel.setBounds(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
+        layeredPane.add(backgroundLabel, Integer.valueOf(0));
+
+        Menu menu = new Menu();
+        int menuWidth = 400;
+        int menuHeight = 600;
+        int menuX = 150;
+        int menuY = 200;
+        menu.setBounds(menuX, menuY, menuWidth, menuHeight);
+        layeredPane.add(menu, Integer.valueOf(1));
+
+        basicInfo = new BasicInfo(menu);
+        basicInfo.setBounds(150, 200, menuWidth, menuHeight);
+        layeredPane.add(basicInfo, Integer.valueOf(2));
+        basicInfo.setVisible(false);
+
+        // Instantiate ShowWeather class
+        showWeather = new ShowWeather(menu);
+        showWeather.setBounds(150, 200, menuWidth, menuHeight);
+        layeredPane.add(showWeather, Integer.valueOf(3)); // Add above BasicInfo
+        showWeather.setVisible(false); // Initially hide ShowWeather panel
+
+        // Action listener for Show Weather button in Menu
+        menu.addPropertyChangeListener(evt -> {
+            if ("ShowCurrentWeatherButtonClicked".equals(evt.getPropertyName())) {
+                // Show ShowWeather panel and hide others
+                showWeather.setVisible(true);
+                basicInfo.setVisible(false);
+            }
+            else if ("ShowBasicInfoButtonClicked".equals(evt.getPropertyName())) {
+                basicInfo.setVisible(true);
+                showWeather.setVisible(false);
+                // Simulate updating weather information
+                basicInfo.updateWeatherInfo(25.5, 20.0, 30.0);
+            }
+        });
+
+        setContentPane(layeredPane);
+        setVisible(true);
+    }
+
+}
+
+
+class Menu extends JPanel {
+    public Menu() {
+        setOpaque(false);
+        setLayout(new GridBagLayout());
+        setPreferredSize(new Dimension(800, 600));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        addButton("Show current weather conditions", gbc);
+        addButton("Show basic information", gbc);
+        addButton("Show sunrise and sunset time", gbc);
+        addButton("Show weather forecast for 5 days", gbc);
+        addButton("Show Air Pollution data", gbc);
+        addButton("Show data about polluting gases", gbc);
+        addButton("Exit", gbc);
+    }
+
+    private void addButton(String buttonText, GridBagConstraints gbc) {
+        JButton button = new JButton(buttonText);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (buttonText.equals("Show current weather conditions")) {
+                    firePropertyChange("ShowCurrentWeatherButtonClicked", false, true);
+                } else if (buttonText.equals("Show basic information")) {
+                    firePropertyChange("ShowBasicInfoButtonClicked", false, true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "You selected: " + buttonText);
+                }
+            }
+        });
+
+        gbc.gridy++;
+        add(button, gbc);
+    }
+
+    public String getCurrentDate() {
+        return new SimpleDateFormat("MMMM dd, yyyy").format(new Date());
+    }
+}
