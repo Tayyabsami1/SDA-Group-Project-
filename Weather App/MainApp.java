@@ -38,18 +38,29 @@ interface UserInterface {
     void displayLocationOptions(List<Location> locations);
 
     Location getLocationInput();
-    
+
     int getMenuChoice();
+
     Location getLocationInput();
+
     List<Location> getLocationsByLatLngInput();
+
     List<Location> getLocationsByCityInput();
+
     void displayWeatherData(WeatherData data);
+
     void displayLocationOptions(List<Location> locations);
+
     void showCurrentWeather(WeatherService weatherService, UserInterface ui);
+
     void showBasicInfo(WeatherService weatherService, UserInterface ui);
+
     void showSunriseSunset(WeatherService weatherService, UserInterface ui);
+
     void showWeatherForecast(WeatherService weatherService, UserInterface ui);
+
     void showAirPollution(WeatherService weatherService, UserInterface ui);
+
     void showPollutingGases(WeatherService weatherService, UserInterface ui);
 
 }
@@ -67,7 +78,11 @@ interface Storage {
 // * API Logic starts here
 // https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&appid={yourownapikey}
 interface WeatherService {
+    // Get Normal Weather Data
     String getWeatherData(Coord location);
+
+    // Get Forecast for 5 next days
+    Forecast getForecastData(Coord location);
 }
 
 class WeatherServiceImpl implements WeatherService {
@@ -80,12 +95,13 @@ class WeatherServiceImpl implements WeatherService {
         myweatherData = new WeatherData();
     }
 
-    @Override
-    public WeatherData getWeatherData(Coord location) {
+    // utility function to call Api
+    public String responseReturner(String api) {
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(api))
                 .header("X", "api.openweathermap.org")
-                .header("X-RapidAPI-Key", "yourApikey")
+                .header("X-RapidAPI-Key", "2a8a0b0b17f5b1d25f15762b2fa658f4")
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
         HttpResponse<String> response = null;
@@ -102,18 +118,57 @@ class WeatherServiceImpl implements WeatherService {
             e.printStackTrace();
         }
 
-        String res = response.body();
+        System.out.println(response.body());
+
+        return response.body();
+    }
+
+    @Override
+    public WeatherData getWeatherData(Coord location) {
+        WeatherData myweatherData = new WeatherData();
+        String lat = String.valueOf(location.getLatitude());
+        String lon = String.valueOf(location.getLongitude());
+
+        api = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon
+                + "&date=2020-03-04&appid=2a8a0b0b17f5b1d25f15762b2fa658f4";
+
+        String res = responseReturner(api);
+
         ObjectMapper mapper = new ObjectMapper();
 
         try {
             myweatherData = mapper.readValue(res, WeatherData.class);
-        }
-
-        catch (IOException e) {
-            System.out.println("fault is there");
+        } catch (IOException e) {
+            System.out.println(e);
         }
 
         return myweatherData;
+    }
+
+    
+    @Override
+    public Forecast getForecastData(Coord location) {
+
+        Forecast myforecastData = new Forecast();
+
+        String lat = String.valueOf(location.getLatitude());
+        String lon = String.valueOf(location.getLongitude());
+
+        api = "https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon
+                + "&date=2020-03-04&appid=2a8a0b0b17f5b1d25f15762b2fa658f4";
+
+        String res = responseReturner(api);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            myforecastData = mapper.readValue(res, Forecast.class);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+
+        return myforecastData;
+
     }
 
     // Sample main to test out the APi
@@ -135,7 +190,7 @@ class WeatherServiceImpl implements WeatherService {
     }
 }
 
-//TODO : Update class diagram accordingly 
+// TODO : Update class diagram accordingly
 // * My API main class
 class WeatherData {
 
@@ -309,7 +364,7 @@ class AirPollution {
     }
 }
 
-//TODO : Update class diagram and add these 6 classes
+// TODO : Update class diagram and add these 6 classes
 // * My Api related classes
 class Coord {
     public double lon;
@@ -502,7 +557,6 @@ class Sys {
 
 }
 
-
 // * API logic ends here
 
 class TerminalUI implements UserInterface {
@@ -553,81 +607,81 @@ class TerminalUI implements UserInterface {
         return new Location(name, latitude, longitude);
     }
 
-   class TerminalUI implements UserInterface {
-    private final Scanner scanner = new Scanner(System.in);
+    class TerminalUI implements UserInterface {
+        private final Scanner scanner = new Scanner(System.in);
 
-    @Override
-    public int getMenuChoice() {
-        System.out.println("\nWeather App Menu:");
-        System.out.println("  1. Show current weather conditions");
-        System.out.println("  2. Show basic information like 'Feels like, minimum and maximum temperature'");
-        System.out.println("  3. Show sunrise and sunset time");
-        System.out.println("  4. Show weather forecast for 5 days");
-        System.out.println("  5. Show Air Pollution data");
-        System.out.println("  6. Show data about polluting gases");
-        System.out.println("  7. Exit");
-        System.out.print("Enter your choice: ");
-        return scanner.nextInt();
-    }
+        @Override
+        public int getMenuChoice() {
+            System.out.println("\nWeather App Menu:");
+            System.out.println("  1. Show current weather conditions");
+            System.out.println("  2. Show basic information like 'Feels like, minimum and maximum temperature'");
+            System.out.println("  3. Show sunrise and sunset time");
+            System.out.println("  4. Show weather forecast for 5 days");
+            System.out.println("  5. Show Air Pollution data");
+            System.out.println("  6. Show data about polluting gases");
+            System.out.println("  7. Exit");
+            System.out.print("Enter your choice: ");
+            return scanner.nextInt();
+        }
 
-    @Override
-    public Location getLocationInput() {
-        // Implement as required
-        return null;
-    }
+        @Override
+        public Location getLocationInput() {
+            // Implement as required
+            return null;
+        }
 
-    @Override
-    public List<Location> getLocationsByLatLngInput() {
-        // Implement as required
-        return null;
-    }
+        @Override
+        public List<Location> getLocationsByLatLngInput() {
+            // Implement as required
+            return null;
+        }
 
-    @Override
-    public List<Location> getLocationsByCityInput() {
-        // Implement as required
-        return null;
-    }
+        @Override
+        public List<Location> getLocationsByCityInput() {
+            // Implement as required
+            return null;
+        }
 
-    @Override
-    public void displayWeatherData(WeatherData data) {
-        // Implement as required
-    }
+        @Override
+        public void displayWeatherData(WeatherData data) {
+            // Implement as required
+        }
 
-    @Override
-    public void displayLocationOptions(List<Location> locations) {
-        // Implement as required
-    }
+        @Override
+        public void displayLocationOptions(List<Location> locations) {
+            // Implement as required
+        }
 
-    @Override
-    public void showCurrentWeather(WeatherService weatherService, UserInterface ui) {
-        // Implement as required
-    }
+        @Override
+        public void showCurrentWeather(WeatherService weatherService, UserInterface ui) {
+            // Implement as required
+        }
 
-    @Override
-    public void showBasicInfo(WeatherService weatherService, UserInterface ui) {
-        // Implement as required
-    }
+        @Override
+        public void showBasicInfo(WeatherService weatherService, UserInterface ui) {
+            // Implement as required
+        }
 
-    @Override
-    public void showSunriseSunset(WeatherService weatherService, UserInterface ui) {
-        // Implement as required
-    }
+        @Override
+        public void showSunriseSunset(WeatherService weatherService, UserInterface ui) {
+            // Implement as required
+        }
 
-    @Override
-    public void showWeatherForecast(WeatherService weatherService, UserInterface ui) {
-        // Implement as required
-    }
+        @Override
+        public void showWeatherForecast(WeatherService weatherService, UserInterface ui) {
+            // Implement as required
+        }
 
-    @Override
-    public void showAirPollution(WeatherService weatherService, UserInterface ui) {
-        // Implement as required
-    }
+        @Override
+        public void showAirPollution(WeatherService weatherService, UserInterface ui) {
+            // Implement as required
+        }
 
-    @Override
-    public void showPollutingGases(WeatherService weatherService, UserInterface ui) {
-        // Implement as required
+        @Override
+        public void showPollutingGases(WeatherService weatherService, UserInterface ui) {
+            // Implement as required
+        }
     }
-}
 }
 
 class FileStorage implements Storage {
