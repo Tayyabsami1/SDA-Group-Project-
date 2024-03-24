@@ -43,6 +43,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.io.LineNumberReader;
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 interface UserInterface {
     void displayWeatherData(WeatherData data);
@@ -58,7 +60,7 @@ interface UserInterface {
 
     // List<Location> getLocationsByCityInput();
 
-    void showCurrentWeather(WeatherService weatherService, UserInterface ui);
+    void showCurrentWeather(WeatherService weatherService,Location location,Storage storage );
 
     void showBasicInfo(WeatherService weatherService, Location location,Storage storage);
 
@@ -82,6 +84,10 @@ interface Storage {
     WeatherData getWeatherData(Location location);
     void saveBasicInfo(Location location, double fl,double Tmin, double Tmax);
     boolean checkBasicInfo(Location location);
+    void saveSunInfo(Location location, String SunR, String SunS);
+    boolean checkSunInfo(Location location);
+    void saveCurrentInfo(Location location, String main,String  description,double temp, int pressure, int humidity,double speed);
+    boolean checkCurrentInfo(Location location);
 }
 
 // * API Logic starts here
@@ -641,8 +647,17 @@ class Weather {
     public String getIcon() {
         return icon;
     }
+    public void setMain(String s)
+    {
+        main=s;
+    }
+    public void setDescription(String s)
+    {
+        description=s;
+    }
 
 }
+
 
 class Main {
     public double temp;
@@ -705,6 +720,18 @@ class Main {
     {
         date=d;
     }
+    public  void setTemp(double d)
+    {
+        temp=d;
+    }
+    public  void setPressure(int d)
+    {
+        pressure=d;
+    }
+    public  void setHumidity(int d)
+    {
+        humidity=d;
+    }
 
     public String getLocation()
     {
@@ -752,6 +779,10 @@ class Wind {
         this.gust = gust;
     }
 
+    public  void setSpeed(double d)
+    {
+        speed=d;
+    }
     public double getSpeed() {
         return speed;
     }
@@ -765,6 +796,7 @@ class Wind {
     }
 
 }
+
 
 class Clouds {
     public int all;
@@ -783,10 +815,11 @@ class Clouds {
 }
 
 class Sys {
-    public int sunrise;
-    public int sunset;
+    public long sunrise;
+    public long sunset;
     public String pod;
-    public String country;
+    String location;
+    String date;
 
     public Sys() {
         this.sunrise = 0; // Default sunrise time (seconds since epoch)
@@ -797,17 +830,40 @@ class Sys {
         this.sunrise = sunrise;
         this.sunset = sunset;
     }
+     public  void setLocation(String l)
+    {
+        location=l;
+    }
+    public  void setDate(String d)
+    {
+        date=d;
+    }
+    public void setSunrise(long s)
+    {
+        sunrise=s;
+    }
+    public void setSunset(long s)
+    {
+        sunset=s;
+    }
 
-    public int getSunrise() {
+    public long getSunrise() {
         return sunrise;
     }
 
-    public int getSunset() {
+    public long getSunset() {
         return sunset;
+    }
+    public String getLocation()
+    {
+        return location;
+    }
+    public String getDate()
+    {
+        return date;
     }
 
 }
-
 // * API logic ends here
 
 class TerminalUI implements UserInterface {
@@ -884,8 +940,30 @@ class TerminalUI implements UserInterface {
 
 
     @Override
-    public void showCurrentWeather(WeatherService weatherService, UserInterface ui) {
+    public void showCurrentWeather(WeatherService weatherService,Location location,Storage storage )
+   {
         // Implement as required
+        String main;
+        String description;
+        double temp;
+        int pressure;
+        int humidity;
+        double speed;
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        WeatherData Data = weatherService.getWeatherData(myloc);
+        temp=Data.getMain().getTemp();
+        pressure=Data.getMain().getPressure();
+        humidity=Data.getMain().getHumidity();
+        speed=Data.getWind().getSpeed();
+        List<Weather> list=Data.getWeather();
+        for (Weather weather : list) {
+            main = weather.getMain();
+            description = weather.getDescription();
+        }
+        System.out.println("Weather: "+main+"\nDescription: "+description+"\nTemperature: "+temp+
+        "\nPressure: "+pressure+"Humidity: "+humidity+"\nWind Speed: "+speed);
+        storage.saveCurrentInfo(location, main, description, temp,pressure,humidity,speed);
+
     }
 
     @Override
@@ -899,13 +977,29 @@ class TerminalUI implements UserInterface {
         feels_like=Data.getMain().getFeelsLike();
         temp_min=Data.getMain().getTempMin();
         temp_max=Data.getMain().getTempMax();
-        System.out.println("Feels Like: "+feels_like+"\n Minimum Temperature: "+temp_min+"Maximum Temperature: "+temp_max);
+        System.out.println("Feels Like: "+feels_like+"\nMinimum Temperature: "+temp_min+"Maximum Temperature: "+temp_max);
         storage.saveBasicInfo(location, feels_like, temp_min, temp_max);
     }
 
     @Override
     public void showSunriseSunset(WeatherService weatherService,Location location,Storage storage) {
         // Implement as required
+        long  sun_rise;
+        long  sun_set;
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        WeatherData Data = weatherService.getWeatherData(myloc);
+        sun_rise=Data.getSys().getSunrise();
+        sun_set=Data.getSys().getSunset();
+
+        // Convert timestamp to Date object (assuming seconds)
+        Date date1 = new Date(sun_rise * 1000); // Multiply by 1000 if milliseconds
+        Date date2 = new Date(sun_set * 1000);
+        // Format the date to "hh:mm:ss" format
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss"); // Use "HH" for 24-hour format
+        String SunR = formatter.format(date1);
+        String SunS = formatter.format(date2);
+        System.out.println("Sun Rise Time: "+SunR+"\nSun Set Time: "+SunS);
+        storage.saveSunInfo(location, SunR, SunS);
     }
 
     @Override
@@ -923,7 +1017,6 @@ class TerminalUI implements UserInterface {
         // Implement as required
     }
 }
-
 class Location {
     private final String name;
     private final double latitude;
@@ -1047,25 +1140,193 @@ class FileStorage implements Storage {
         return true;
           
     }
+   
     @Override
-    public void saveLocation(Location location) {
-        List<Location> locations = getLocations();
-        locations.add(location);
-        writeLocationsToFile(locations);
+    public void saveSunInfo(Location location, String SunR, String SunS)
+    {
+        try {
+
+            File myFile = new File("SunInfo.txt");
+            FileWriter writer = new FileWriter(myFile,true);
+            LocalDate today = LocalDate.now();
+            writer.write(location.getName());
+            writer.write(",");
+            writer.write(SunR);
+            writer.write(",");
+            writer.write(SunS);
+            writer.write(",");
+            writer.write(String.valueOf(today));
+            writer.write("\n");
+            writer.close();
+        } 
+          catch (IOException e) 
+          {
+            System.err.println("Error writing to file: " + e.getMessage());
+          }
+
     }
 
     @Override
-    public List<Location> getLocations() {
-        File file = new File(storageFile);
-        if (!file.exists()) {
-            return new ArrayList<>();
+    public boolean checkSunInfo(Location location)
+    {
+        String delimiter = ",";  // Word to stop reading
+        int numberOfLines = 0;
+        LocalDate today = LocalDate.now();
+        boolean check=false;
+       try{
+            LineNumberReader reader = new LineNumberReader(new FileReader("SunInfo.txt"));
+            while (reader.readLine() != null) {
+                numberOfLines++;
+            }
+            reader.close();
+            
         }
+            catch (IOException e) {
+                System.err.println("Error reading file: " + e.getMessage());
+            }
+            Sys[] arr= new Sys[numberOfLines];
+       try{
+          Scanner scanner = new Scanner(new File("SunInfo.txt"));
+          scanner.useDelimiter(delimiter);  // Set delimiter for splitting
+    
+          for( int i=0;i<arr.length;i++)
+          {
+            arr[i] = new Sys();
+              arr[i].setLocation(scanner.next());
+              arr[i].setSunrise(Long.parseLong(scanner.next()));
+              arr[i].setSunset(Long.parseLong(scanner.next()));
+              String firstLine = scanner.nextLine();
+              arr[i].setDate(firstLine.substring(1));
+
+          }
+          scanner.close();
+        }
+          catch (FileNotFoundException e) {
+            System.err.println("Error opening file:  " + e.getMessage());
+        }
+        int index=0;
+        for(int i=0;i<arr.length;i++)
+        {
+            
+            if(arr[i].getLocation().equalsIgnoreCase(location.getName()))
+            {
+                if(arr[i].getDate().equals(String.valueOf(today)))
+                {
+                    check=true;
+                    index=i;
+
+                }
+            }
+        }
+        if(check==false)
+        {
+            return false;
+        }
+        System.out.println("Sun Rise Time: "+arr[index].getSunrise()+"\nSun Set Time: "+arr[index].getSunset());
+        return true;
+
+    }
+    @Override
+    public void saveCurrentInfo(Location location, String main,String  description,double temp, int pressure, int humidity,double speed)
+    {
         try {
-            return objectMapper.readValue(file, List.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+
+            File myFile = new File("CurrentInfo.txt");
+            FileWriter writer = new FileWriter(myFile,true);
+            LocalDate today = LocalDate.now();
+            writer.write(location.getName());
+            writer.write(",");
+            writer.write(main);
+            writer.write(",");
+            writer.write(description);
+            writer.write(",");
+            writer.write(String.valueOf(temp));
+            writer.write(",");
+            writer.write(String.valueOf(pressure));
+            writer.write(",");
+            writer.write(String.valueOf(humidity));
+            writer.write(",");
+            writer.write(String.valueOf(speed));
+            writer.write(",");
+            writer.write(String.valueOf(today));
+            writer.write("\n");
+            writer.close();
+        } 
+          catch (IOException e) 
+          {
+            System.err.println("Error writing to file: " + e.getMessage());
+          }
+
+
+    }
+
+    @Override
+    public boolean checkCurrentInfo(Location location)
+    {
+        String delimiter = ",";  // Word to stop reading
+        int numberOfLines = 0;
+        LocalDate today = LocalDate.now();
+        boolean check=false;
+       try{
+            LineNumberReader reader = new LineNumberReader(new FileReader("CurrentInfo.txt"));
+            while (reader.readLine() != null) {
+                numberOfLines++;
+            }
+            reader.close();
+            
         }
+            catch (IOException e) {
+                System.err.println("Error reading file: " + e.getMessage());
+            }
+            Main[] arr= new Main[numberOfLines];
+            Weather[] arr1= new Weather[numberOfLines];
+            Wind[] arr2= new Wind[numberOfLines];
+       try{
+          Scanner scanner = new Scanner(new File("CurrentInfo.txt"));
+          scanner.useDelimiter(delimiter);  // Set delimiter for splitting
+    
+          for( int i=0;i<arr.length;i++)
+          {
+            arr[i] = new Main();
+            arr1[i] = new Weather();
+            arr2[i] = new Wind();
+              arr[i].setLocation(scanner.next());
+              arr1[i].setMain(scanner.next());
+              arr1[i].setDescription(scanner.next());
+              arr[i].setTemp(Double.parseDouble(scanner.next()));
+              arr[i].setPressure(Integer.parseInt(scanner.next()));
+              arr[i].setHumidity(Integer.parseInt(scanner.next()));
+              arr2[i].setSpeed(Double.parseDouble(scanner.next()));
+              String firstLine = scanner.nextLine();
+              arr[i].setDate(firstLine.substring(1));
+
+          }
+          scanner.close();
+        }
+          catch (FileNotFoundException e) {
+            System.err.println("Error opening file:  " + e.getMessage());
+        }
+        int index=0;
+        for(int i=0;i<arr.length;i++)
+        {
+            
+            if(arr[i].getLocation().equalsIgnoreCase(location.getName()))
+            {
+                if(arr[i].getDate().equals(String.valueOf(today)))
+                {
+                    check=true;
+                    index=i;
+
+                }
+            }
+        }
+        if(check==false)
+        {
+            return false;
+        }
+        System.out.println("Weather:  "+arr1[index].getMain()+"\nDescription:"+arr1[index].getDescription()+"\nTemperature: "+arr[index].getTemp()+
+        "\nPressure: "+arr[index].getPressure()+"\nHumidity: "+arr[index].getHumidity()+"\nSpeed: "+arr2[index].getSpeed());
+        return true;
     }
 
     @Override
@@ -1084,6 +1345,26 @@ class FileStorage implements Storage {
             objectMapper.writeValue(new File(storageFile), locations);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    @Override
+    public void saveLocation(Location location) {
+        List<Location> locations = getLocations();
+        locations.add(location);
+        writeLocationsToFile(locations);
+    }
+
+    @Override
+    public List<Location> getLocations() {
+        File file = new File(storageFile);
+        if (!file.exists()) {
+            return new ArrayList<>();
+        }
+        try {
+            return objectMapper.readValue(file, List.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 }
@@ -1177,7 +1458,7 @@ class Notification {
     }
 }
 
-/ Changing the Name of the start point
+// Changing the Name of the start point
 // ! Also changed the name of the file so that it runs
 class MainApp {
 
@@ -1198,8 +1479,14 @@ class MainApp {
             int choice = ui.getMenuChoice();
             switch (choice) {
                 case 1:
-                    ui.showCurrentWeather(weatherService, ui);
+                {
+                    boolean check=storage.checkCurrentInfo(location);
+                    if(check==false)
+                    {
+                    ui.showCurrentWeather(weatherService,location,storage );
+                    }
                     break;
+                }
                 case 2:
                 {
                     boolean check=storage.checkBasicInfo(location);
@@ -1211,7 +1498,7 @@ class MainApp {
                 }
                 case 3:
                 {
-                    boolean check=storage.checkBasicInfo(location);
+                    boolean check=storage.checkSunInfo(location);
                     if(check==false)
                     {
                     ui.showSunriseSunset(weatherService,location,storage);
