@@ -420,6 +420,75 @@ class list {
 
 }
 
+// *My Api class New for Forecasting
+class City {
+
+    public int id;
+    public String name;
+    public Coord coord;
+    public String country;
+    public int population;
+    public int timezone;
+    public long sunrise;
+    public long sunset;
+
+    // Getters and setters (optional)
+
+    public City(int id, String name, Coord coord, String country, int population, int timezone, long sunrise,
+            long sunset) {
+        this.id = id;
+        this.name = name;
+        this.coord = coord;
+        this.country = country;
+        this.population = population;
+        this.timezone = timezone;
+        this.sunrise = sunrise;
+        this.sunset = sunset;
+    }
+
+    public City()
+    {
+        this.id = 0;
+        this.name = "";
+        this.country = "";
+        this.population = 0;
+        this.timezone = 0;
+        this.sunrise = 0;
+        this.sunset = 0;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Coord getCoord() {
+        return coord;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public int getPopulation() {
+        return population;
+    }
+
+    public int getTimezone() {
+        return timezone;
+    }
+
+    public long getSunrise() {
+        return sunrise;
+    }
+
+    public long getSunset() {
+        return sunset;
+    }
+}
 
 // TODO : Update class diagram and add these 6 classes
 // * My Api related classes
