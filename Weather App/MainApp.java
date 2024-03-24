@@ -86,6 +86,10 @@ interface Storage {
 
 // * API Logic starts here
 // https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&appid={yourownapikey}
+// http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={APIkey}
+// https://api.openweathermap.org/data/2.5/forecast?lat=33.44&lon=94.04&appid={APIKEY}
+//https://api.openweathermap.org/data/2.5/weather?q=Pakistan&APPID={APIKEY}
+
 interface WeatherService {
     // Get Normal Weather Data
     WeatherData getWeatherData(Coord location);
@@ -211,6 +215,8 @@ class WeatherData {
     public int id;
     public String name;
     public int cod;
+    public int pop;
+    public String dt_txt;
 
     public WeatherData(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
             Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
@@ -292,12 +298,14 @@ class WeatherData {
     }
 
 }
+
 // *Modified Forecast class to use it as my Api data store to store forecast data 
+
 class Forecast {
     public int cod;
     public int message;
     public int cnt;
-    public List<list> list;
+    public List<WeatherData> list;
     public City city;
 
     public int getCod() {
@@ -312,117 +320,12 @@ class Forecast {
         return cnt;
     }
 
-    public List<list> getList() {
+    public List<WeatherData> getList() {
         return list;
     }
 
     public City getCity() {
         return city;
-    }
-
-}
-
-// *Alternate of weather data to store forecast data
-class list {
-    public Coord coord;
-    public List<Weather> weather;
-    public String base;
-    public Main main;
-    public int visibility;
-    public Wind wind;
-    public Clouds clouds;
-    public long dt;
-    public Sys sys;
-    public int timezone;
-    public int id;
-    public String name;
-    public int cod;
-    public int pop;
-    public String dt_txt;
-
-    public list(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
-            Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod, int pop) {
-        this.coord = coord;
-        this.weather = weather;
-        this.base = base;
-        this.main = main;
-        this.visibility = visibility;
-        this.wind = wind;
-        this.clouds = clouds;
-        this.dt = dt;
-        this.sys = sys;
-        this.timezone = timezone;
-        this.id = id;
-        this.name = name;
-        this.cod = cod;
-        this.pop = pop;
-    }
-
-    public list() {
-        this.coord = new Coord();
-        this.visibility = 0;
-        this.dt = 0;
-        this.timezone = 0;
-        this.id = 0;
-        this.name = "";
-        this.cod = 0;
-        this.pop = 0;
-    }
-
-    public int getpop() {
-        return this.pop;
-    }
-
-    public Coord getCoord() {
-        return coord;
-    }
-
-    public List<Weather> getWeather() {
-        return weather;
-    }
-
-    public String getBase() {
-        return base;
-    }
-
-    public Main getMain() {
-        return main;
-    }
-
-    public int getVisibility() {
-        return visibility;
-    }
-
-    public Wind getWind() {
-        return wind;
-    }
-
-    public Clouds getClouds() {
-        return clouds;
-    }
-
-    public long getDt() {
-        return dt;
-    }
-
-    public Sys getSys() {
-        return sys;
-    }
-
-    public int getTimezone() {
-        return timezone;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getCod() {
-        return cod;
     }
 
 }
