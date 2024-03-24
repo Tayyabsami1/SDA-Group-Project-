@@ -193,3 +193,72 @@ class ShowWeather extends JPanel {
         g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
     }
 }
+ 
+
+
+
+
+
+ class BasicInfo extends JPanel {
+    private JLabel feelsLikeLabel;
+    private JLabel minTempLabel;
+    private JLabel maxTempLabel;
+
+    public BasicInfo(Menu menu) {
+        setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        // Adjust font size and color
+        Font labelFont = new Font("Arial", Font.BOLD, 16);
+        Color labelColor = Color.white;
+
+        feelsLikeLabel = new JLabel("Feels Like: ");
+        feelsLikeLabel.setFont(labelFont);
+        feelsLikeLabel.setForeground(labelColor);
+        add(feelsLikeLabel, gbc);
+
+        gbc.gridy++;
+        minTempLabel = new JLabel("Minimum Temperature: ");
+        minTempLabel.setFont(labelFont);
+        minTempLabel.setForeground(labelColor);
+        add(minTempLabel, gbc);
+
+        gbc.gridy++;
+        maxTempLabel = new JLabel("Maximum Temperature: ");
+        maxTempLabel.setFont(labelFont);
+        maxTempLabel.setForeground(labelColor);
+        add(maxTempLabel, gbc);
+
+        gbc.gridy++;
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                menu.setVisible(true);
+            }
+        });
+        add(backButton, gbc);
+    }
+
+    // Method to update weather information
+    public void updateWeatherInfo(double feelsLike, double minTemp, double maxTemp) {
+        feelsLikeLabel.setText("Feels Like: " + feelsLike + "°C");
+        minTempLabel.setText("Minimum Temperature: " + minTemp + "°C");
+        maxTempLabel.setText("Maximum Temperature: " + maxTemp + "°C");
+    }
+
+    // Method to set background image
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg"); // Adjust image path
+        g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+    }
+}
+
