@@ -145,7 +145,6 @@ class WeatherServiceImpl implements WeatherService {
         return myweatherData;
     }
 
-
     @Override
     public Forecast getForecastData(Coord location) {
 
@@ -173,14 +172,15 @@ class WeatherServiceImpl implements WeatherService {
 
     // Sample main to test out the APi
     public static void main(String[] args) {
-         WeatherServiceImpl myobj = new WeatherServiceImpl(
+        WeatherServiceImpl myobj = new WeatherServiceImpl(
                 "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=yourapikey");
 
         System.out.println("Working fine ");
         Coord myloc = new Coord(25.5, 20.5);
         WeatherData MyApiData = myobj.getWeatherData(myloc);
         Forecast ForecastData = myobj.getForecastData(myloc);
-        // ! This returns a list of 40 weather forecase for the next 5 days each list contains forecast of 3hrs
+        // ! This returns a list of 40 weather forecase for the next 5 days each list
+        // contains forecast of 3hrs
         System.out.println(ForecastData.getList().size());
     }
 }
@@ -284,7 +284,7 @@ class WeatherData {
 
 }
 
-// *Modified Forecast class to use it as my Api data store to store forecast data
+// *Modified Forecast class to use it as my Api data store to store forecast data 
 class Forecast {
     public int cod;
     public int message;
@@ -333,7 +333,7 @@ class list {
     public String dt_txt;
 
     public list(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
-            Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod,int pop) {
+            Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod, int pop) {
         this.coord = coord;
         this.weather = weather;
         this.base = base;
@@ -347,7 +347,7 @@ class list {
         this.id = id;
         this.name = name;
         this.cod = cod;
-        this.pop=pop;
+        this.pop = pop;
     }
 
     public list() {
@@ -358,11 +358,10 @@ class list {
         this.id = 0;
         this.name = "";
         this.cod = 0;
-        this.pop=0;
+        this.pop = 0;
     }
 
-    public int getpop()
-    {
+    public int getpop() {
         return this.pop;
     }
 
@@ -446,8 +445,7 @@ class City {
         this.sunset = sunset;
     }
 
-    public City()
-    {
+    public City() {
         this.id = 0;
         this.name = "";
         this.country = "";
@@ -491,7 +489,8 @@ class City {
 }
 
 // TODO : Update class diagram and add these 6 classes
-// * My Api related classes 
+
+// * My Api related classes
 class Coord {
     public double lon;
     public double lat;
@@ -581,11 +580,11 @@ class Main {
         this.humidity = 0; // Default humidity
         this.sea_level = 0;
         this.grnd_level = 0;
-        this.temp_kf=0;
+        this.temp_kf = 0;
     }
 
     public Main(double temp, double feels_like, double temp_min, double temp_max, int pressure, int humidity,
-            int sea_level, int grnd_level,int temp_kf) {
+            int sea_level, int grnd_level, int temp_kf) {
         this.temp = temp;
         this.feels_like = feels_like;
         this.temp_min = temp_min;
@@ -594,7 +593,7 @@ class Main {
         this.humidity = humidity;
         this.sea_level = sea_level;
         this.grnd_level = grnd_level;
-        this.temp_kf=temp_kf;
+        this.temp_kf = temp_kf;
     }
 
     public double getTemp() {
@@ -693,7 +692,6 @@ class Sys {
     }
 
 }
-
 
 // * API logic ends here
 
