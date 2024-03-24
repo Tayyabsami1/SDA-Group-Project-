@@ -93,7 +93,7 @@ interface Storage {
 interface WeatherService {
     // Get Normal Weather Data
     WeatherData getWeatherData(Coord location);
-
+    WeatherData getWeatherData(String country);
     // Get Forecast for 5 next days
     Forecast getForecastData(Coord location);
 
@@ -162,6 +162,22 @@ class WeatherServiceImpl implements WeatherService {
     }
 
     @Override
+    public WeatherData getWeatherData(String country) {
+        WeatherData myweatherData = new WeatherData();
+        api="https://api.openweathermap.org/data/2.5/weather?q="+country+"&APPID=2a8a0b0b17f5b1d25f15762b2fa658f4";
+        String res = responseReturner(api);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            myweatherData = mapper.readValue(res, WeatherData.class);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        return myweatherData;
+    }
+
+    @Override
     public Forecast getForecastData(Coord location) {
 
         Forecast myforecastData = new Forecast();
@@ -220,11 +236,13 @@ class WeatherServiceImpl implements WeatherService {
         Coord myloc = new Coord(25.5, 20.5);
 
         WeatherData MyApiData = myobj.getWeatherData(myloc);
+        WeatherData MyApiData2 = myobj.getWeatherData("Pakistan");
         Forecast ForecastData = myobj.getForecastData(myloc);
         AirPollution MyPollutionData=myobj.getPollutionData(myloc);
         // ! This returns a list of 40 weather forecase for the next 5 days each list
         // contains forecast of 3hrs
         System.out.println(MyApiData.getVisibility());
+        System.out.println(MyApiData2.getSys().country);
         System.out.println(ForecastData.getList().size());
         System.out.println("No2 in Air is "+MyPollutionData.getList().get(0).getComponents().no2);
     }
@@ -768,6 +786,7 @@ class Sys {
     public int sunrise;
     public int sunset;
     public String pod;
+    public String country;
 
     public Sys() {
         this.sunrise = 0; // Default sunrise time (seconds since epoch)
