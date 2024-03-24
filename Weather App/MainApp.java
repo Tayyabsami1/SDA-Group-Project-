@@ -96,6 +96,9 @@ interface WeatherService {
 
     // Get Forecast for 5 next days
     Forecast getForecastData(Coord location);
+
+    // Air polution for certain longitude and latitide
+    AirPollution getPollutionData(Coord locattion);
 }
 
 class WeatherServiceImpl implements WeatherService {
@@ -183,18 +186,47 @@ class WeatherServiceImpl implements WeatherService {
 
     }
 
+    @Override
+    public AirPollution getPollutionData(Coord location) {
+
+        AirPollution myPollutionData = new AirPollution();
+        String lat = String.valueOf(location.getLatitude());
+        String lon = String.valueOf(location.getLongitude());
+
+        api = "https://api.openweathermap.org/data/2.5/air_pollution?lat=" + lat + "&lon=" + lon
+                + "&date=2020-03-04&appid=yourapikey";
+
+        String res = responseReturner(api);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            myPollutionData = mapper.readValue(res, AirPollution.class);
+        }
+         catch (IOException e) {
+            System.out.println(e);
+        }
+
+        return myPollutionData;
+    }
+
     // Sample main to test out the APi
     public static void main(String[] args) {
         WeatherServiceImpl myobj = new WeatherServiceImpl(
                 "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=yourapikey");
 
         System.out.println("Working fine ");
+
         Coord myloc = new Coord(25.5, 20.5);
+
         WeatherData MyApiData = myobj.getWeatherData(myloc);
         Forecast ForecastData = myobj.getForecastData(myloc);
+        AirPollution MyPollutionData=myobj.getPollutionData(myloc);
         // ! This returns a list of 40 weather forecase for the next 5 days each list
         // contains forecast of 3hrs
+        System.out.println(MyApiData.getVisibility());
         System.out.println(ForecastData.getList().size());
+        System.out.println("No2 in Air is "+MyPollutionData.getList().get(0).getComponents().no2);
     }
 }
 
@@ -399,9 +431,132 @@ class City {
     }
 }
 
-// TODO : Update class diagram and add these 6 classes
+// * Modified class to store Air pollution data
+class AirPollution {
+    public Coord coord;
+    public List<AirQuality> list;
+
+    public Coord getCoord() {
+        return coord;
+    }
+
+    public List<AirQuality> getList() {
+        return list;
+    }
+
+}
+
+class AirQuality {
+
+    public AirIndex main;
+    public Components components;
+    public long dt;
+
+    public AirQuality(AirIndex main, Components components, long dt) {
+        this.main = main;
+        this.components = components;
+        this.dt = dt;
+    }
+
+    public AirQuality() {
+
+    }
+
+    public AirIndex getMain() {
+        return main;
+    }
+
+    public Components getComponents() {
+        return components;
+    }
+
+    public long getDt() {
+        return dt;
+    }
+}
+
+class AirIndex {
+
+    public int aqi;
+
+    public AirIndex()
+    {
+
+    }
+
+    public AirIndex(int aqi) {
+        this.aqi = aqi;
+    }
+
+    int getAqi() {
+        return this.aqi;
+    }
+}
+
+// TODO : Update class diagram and add these 7 classes
 
 // * My Api related classes
+
+// Air polution data store 
+class Components {
+
+    public double co;
+    public double no;
+    public double no2;
+    public double o3;
+    public double so2;
+    public double pm2_5;
+    public double pm10;
+    public double nh3;
+
+    public Components(double co, double no, double no2, double o3, double so2, double pm2_5, double pm10, double nh3) {
+        this.co = co;
+        this.no = no;
+        this.no2 = no2;
+        this.o3 = o3;
+        this.so2 = so2;
+        this.pm2_5 = pm2_5;
+        this.pm10 = pm10;
+        this.nh3 = nh3;
+    }
+
+    public Components() {
+        // Default constructor
+    }
+
+    public double getCo() {
+        return co;
+    }
+
+    public double getNo() {
+        return no;
+    }
+
+    public double getNo2() {
+        return no2;
+    }
+
+    public double getO3() {
+        return o3;
+    }
+
+    public double getSo2() {
+        return so2;
+    }
+
+    public double getPm2_5() {
+        return pm2_5;
+    }
+
+    public double getPm10() {
+        return pm10;
+    }
+
+    public double getNh3() {
+        return nh3;
+    }
+}
+
 class Coord {
     public double lon;
     public double lat;
@@ -749,6 +904,7 @@ class TerminalUI implements UserInterface {
         // Implement as required
     }
 }
+
 class Location {
     private final String name;
     private final double latitude;
@@ -781,6 +937,7 @@ class Location {
                 '}';
     }
 }
+
 class FileStorage implements Storage {
 
     
@@ -911,7 +1068,6 @@ class FileStorage implements Storage {
         }
     }
 }
-
 
 class DatabaseStorage implements Storage {
 
