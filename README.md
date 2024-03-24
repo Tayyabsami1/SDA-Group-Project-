@@ -2,13 +2,12 @@
 We aim to develop a comprehensive weather app as part of our SDA project, meeting all project requirements.
 This platform serves as our designated repository for submitting our project work.
 ## Features
-Searching
-- 
-- 
-- 
-- 
-- 
-- 
+- Weather by Longitude and Latitude 
+- Weather by Country Name 
+- Accurate Polution Data
+- 5 Day Forecasting 
+- Efficient File Storge
+- Cache Memory to reduce API exhausion.
 
 ## Installation
 
