@@ -104,3 +104,92 @@ class Menu extends JPanel {
         return new SimpleDateFormat("MMMM dd, yyyy").format(new Date());
     }
 }
+
+//Functionality to show the current weahter
+class ShowWeather extends JPanel {
+    private JLabel weatherLabel;
+    private JLabel descriptionLabel;
+    private JLabel temperatureLabel;
+    private JLabel pressureLabel;
+    private JLabel humidityLabel;
+    private JLabel windSpeedLabel;
+
+    public ShowWeather(Menu menu) {
+        setLayout(new GridBagLayout());
+
+        // Set background image
+
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        // Adjust font size and color
+        Font labelFont = new Font("Arial", Font.BOLD, 16);
+        Color labelColor = Color.WHITE; // Set font color to white
+
+        weatherLabel = new JLabel("Current Weather: ");
+        weatherLabel.setFont(labelFont);
+        weatherLabel.setForeground(labelColor);
+        add(weatherLabel, gbc);
+
+        gbc.gridy++;
+        descriptionLabel = new JLabel("Weather Description: ");
+        descriptionLabel.setFont(labelFont);
+        descriptionLabel.setForeground(labelColor);
+        add(descriptionLabel, gbc);
+
+        gbc.gridy++;
+        temperatureLabel = new JLabel("Temperature: ");
+        temperatureLabel.setFont(labelFont);
+        temperatureLabel.setForeground(labelColor);
+        add(temperatureLabel, gbc);
+
+        gbc.gridy++;
+        pressureLabel = new JLabel("Pressure: ");
+        pressureLabel.setFont(labelFont);
+        pressureLabel.setForeground(labelColor);
+        add(pressureLabel, gbc);
+
+        gbc.gridy++;
+        humidityLabel = new JLabel("Humidity: ");
+        humidityLabel.setFont(labelFont);
+        humidityLabel.setForeground(labelColor);
+        add(humidityLabel, gbc);
+
+        gbc.gridy++;
+        windSpeedLabel = new JLabel("Wind Speed: ");
+        windSpeedLabel.setFont(labelFont);
+        windSpeedLabel.setForeground(labelColor);
+        add(windSpeedLabel, gbc);
+
+        gbc.gridy++;
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                menu.setVisible(true);
+            }
+        });
+        add(backButton, gbc);
+    }
+
+    // Method to update current weather information
+    public void updateWeatherInfo(String weather, String description, double temperature, double pressure, double humidity, double windSpeed) {
+        weatherLabel.setText("Current Weather: " + weather);
+        descriptionLabel.setText("Weather Description: " + description);
+        temperatureLabel.setText("Temperature: " + temperature + "°C");
+        pressureLabel.setText("Pressure: " + pressure + " hPa");
+        humidityLabel.setText("Humidity: " + humidity + "%");
+        windSpeedLabel.setText("Wind Speed: " + windSpeed + " m/s");
+    }
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg"); // Adjust image path
+        g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+    }
+}
