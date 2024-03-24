@@ -10,8 +10,7 @@ Searching
 - 
 - 
 
-
-## Run Locally
+## Installation
 
 Clone the project
 
@@ -19,12 +18,17 @@ Clone the project
   git clone https://link-to-project
 ```
 
+Download Object Mapper Libraries and dependencies from  [Object Mapper ](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.17.0) 
+
+## Run Locally
+
 Go to the project directory
 
 ```bash
   cd my-project
 
 ```
+Run the MainApp.java file.
 
 ## Author
 
@@ -34,6 +38,12 @@ Go to the project directory
 - Hammad Talat
 - Ahmed Moeez Azeem
 - Uzair Ahmad
+
+  ## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first
+to discuss what you would like to change.
+
 
 ## Feedback
 
