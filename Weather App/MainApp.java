@@ -101,7 +101,7 @@ class WeatherServiceImpl implements WeatherService {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(api))
                 .header("X", "api.openweathermap.org")
-                .header("X-RapidAPI-Key", "2a8a0b0b17f5b1d25f15762b2fa658f4")
+                .header("X-RapidAPI-Key", "yourapikey")
                 .method("GET", HttpRequest.BodyPublishers.noBody())
                 .build();
         HttpResponse<String> response = null;
@@ -130,7 +130,7 @@ class WeatherServiceImpl implements WeatherService {
         String lon = String.valueOf(location.getLongitude());
 
         api = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon
-                + "&date=2020-03-04&appid=2a8a0b0b17f5b1d25f15762b2fa658f4";
+                + "&date=2020-03-04&appid=yourapikey";
 
         String res = responseReturner(api);
 
@@ -145,7 +145,7 @@ class WeatherServiceImpl implements WeatherService {
         return myweatherData;
     }
 
-    
+
     @Override
     public Forecast getForecastData(Coord location) {
 
@@ -155,7 +155,7 @@ class WeatherServiceImpl implements WeatherService {
         String lon = String.valueOf(location.getLongitude());
 
         api = "https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon
-                + "&date=2020-03-04&appid=2a8a0b0b17f5b1d25f15762b2fa658f4";
+                + "&date=2020-03-04&appid=yourapikey";
 
         String res = responseReturner(api);
 
@@ -173,20 +173,15 @@ class WeatherServiceImpl implements WeatherService {
 
     // Sample main to test out the APi
     public static void main(String[] args) {
-        WeatherServiceImpl myobj = new WeatherServiceImpl(
-                "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=2a8a0b0b17f5b1d25f15762b2fa658f4");
+         WeatherServiceImpl myobj = new WeatherServiceImpl(
+                "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=yourapikey");
 
-        // Print statement to test
         System.out.println("Working fine ");
-
-        Coord myloc = new Coord(0, 0);
-
+        Coord myloc = new Coord(25.5, 20.5);
         WeatherData MyApiData = myobj.getWeatherData(myloc);
-
-        // ! If this gives the same output according to which the API was called your
-        // data is successfully stored
-        System.out.println(MyApiData.getCoord().getLatitude());
-
+        Forecast ForecastData = myobj.getForecastData(myloc);
+        // ! This returns a list of 40 weather forecase for the next 5 days each list contains forecast of 3hrs
+        System.out.println(ForecastData.getList().size());
     }
 }
 
@@ -289,80 +284,142 @@ class WeatherData {
 
 }
 
-// Ahad class
-class CurrentWeather {
-    private final double temperature;
-    private final double feelsLike;
-    private final double minTemp;
-    private final double maxTemp;
-    private final String sunrise;
-    private final String sunset;
-    private final String timestamp;
-
-    public CurrentWeather(double temperature, double feelsLike, double minTemp, double maxTemp, String sunrise,
-            String sunset, String timestamp) {
-        this.temperature = temperature;
-        this.feelsLike = feelsLike;
-        this.minTemp = minTemp;
-        this.maxTemp = maxTemp;
-        this.sunrise = sunrise;
-        this.sunset = sunset;
-        this.timestamp = timestamp;
-    }
-
-    // Getters for all attributes
-}
-
-// Ahad class
-class BasicInfo {
-    private final double feelsLike;
-    private final double minTemp;
-    private final double maxTemp;
-    private final String timestamp;
-
-    public BasicInfo(double feelsLike, double minTemp, double maxTemp, String timestamp) {
-        this.feelsLike = feelsLike;
-        this.minTemp = minTemp;
-        this.maxTemp = maxTemp;
-        this.timestamp = timestamp;
-    }
-
-    // Getters for all attributes
-}
-
-// Ahad Class
+// *Modified Forecast class to use it as my Api data store to store forecast data
 class Forecast {
-    private final String date;
-    private final double temperature;
-    private final String timestamp;
+    public int cod;
+    public int message;
+    public int cnt;
+    public List<list> list;
+    public City city;
 
-    public Forecast(String date, double temperature, String timestamp) {
-        this.date = date;
-        this.temperature = temperature;
-        this.timestamp = timestamp;
+    public int getCod() {
+        return cod;
     }
 
-    // Getters for all attributes
+    public int getMessage() {
+        return message;
+    }
+
+    public int getCnt() {
+        return cnt;
+    }
+
+    public List<list> getList() {
+        return list;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
 }
 
-// Ahad class
-class AirPollution {
-    private final int aqi;
-    private final Map<String, Double> pollutants;
-    private final String timestamp;
+// *Alternate of weather data to store forecast data
+class list {
+    public Coord coord;
+    public List<Weather> weather;
+    public String base;
+    public Main main;
+    public int visibility;
+    public Wind wind;
+    public Clouds clouds;
+    public long dt;
+    public Sys sys;
+    public int timezone;
+    public int id;
+    public String name;
+    public int cod;
+    public int pop;
+    public String dt_txt;
 
-    public AirPollution(int aqi, Map<String, Double> pollutants, String timestamp) {
-        this.aqi = aqi;
-        this.pollutants = pollutants;
-        this.timestamp = timestamp;
+    public list(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
+            Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod,int pop) {
+        this.coord = coord;
+        this.weather = weather;
+        this.base = base;
+        this.main = main;
+        this.visibility = visibility;
+        this.wind = wind;
+        this.clouds = clouds;
+        this.dt = dt;
+        this.sys = sys;
+        this.timezone = timezone;
+        this.id = id;
+        this.name = name;
+        this.cod = cod;
+        this.pop=pop;
     }
 
-    // Getters for all attributes
-
-    public double getPollutantLevel(String pollutantName) {
-        return pollutants.getOrDefault(pollutantName, 0.0);
+    public list() {
+        this.coord = new Coord();
+        this.visibility = 0;
+        this.dt = 0;
+        this.timezone = 0;
+        this.id = 0;
+        this.name = "";
+        this.cod = 0;
+        this.pop=0;
     }
+
+    public int getpop()
+    {
+        return this.pop;
+    }
+
+    public Coord getCoord() {
+        return coord;
+    }
+
+    public List<Weather> getWeather() {
+        return weather;
+    }
+
+    public String getBase() {
+        return base;
+    }
+
+    public Main getMain() {
+        return main;
+    }
+
+    public int getVisibility() {
+        return visibility;
+    }
+
+    public Wind getWind() {
+        return wind;
+    }
+
+    public Clouds getClouds() {
+        return clouds;
+    }
+
+    public long getDt() {
+        return dt;
+    }
+
+    public Sys getSys() {
+        return sys;
+    }
+
+    public int getTimezone() {
+        return timezone;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getCod() {
+        return cod;
+    }
+
 }
+
 
 // TODO : Update class diagram and add these 6 classes
 // * My Api related classes
