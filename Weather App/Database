@@ -1,0 +1,366 @@
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+public class DatabaseStorage
+{
+
+    private static final String jdbcUrl = "jdbc:sqlserver://DeathStrokeYT:1433;instanceName=<SQLEXPRESS01>;databaseName=WeatherAPP";
+    private static final String USER = "hassnain";
+    private static final String PASSWORD = "1122";
+    public static void saveLocation(String name, double latitude, double longitude)
+    {
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement
+                     ("INSERT INTO locations (name, latitude, longitude) VALUES (?, ?, ?)"))
+        {
+            statement.setString(1, name);
+            statement.setDouble(2, latitude);
+            statement.setDouble(3, longitude);
+            statement.executeUpdate();
+        } catch (SQLException e)
+        {
+            System.out.println("Error saving location: " + e.getMessage());
+        }
+    }
+    public static void saveWeatherData(String locationName, MyBasicInfo basicInfo, MySunInfo sunInfo)
+    {
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement
+                     ("INSERT INTO WeatherData (location_name, main_temp, main_feels_like, main_temp_min, main_temp_max, wind_speed, location_latitude, location_longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+            statement.setString(1, locationName);
+            statement.setDouble(2, basicInfo.temp);
+            statement.setDouble(3, basicInfo.feels_like);
+            statement.setDouble(4, basicInfo.temp_min);
+            statement.setDouble(5, basicInfo.temp_max);
+            statement.setDouble(6, basicInfo.wind_speed);
+            statement.setDouble(7, sunInfo.latitude);
+            statement.setDouble(8, sunInfo.longitude);
+            statement.executeUpdate();
+        } catch (SQLException e)
+        {
+            System.out.println("Error saving weather data: " + e.getMessage());
+        }
+    }
+    public static void saveSunInfo(String locationName, MySunInfo sunInfo)
+    {
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO SunInfo (location, sunrise, sunset, date) VALUES (?, ?, ?, ?)")) {
+            statement.setString(1, locationName);
+            statement.setString(2, sunInfo.sunrise);
+            statement.setString(3, sunInfo.sunset);
+            statement.setDate(4, java.sql.Date.valueOf(sunInfo.date));
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error saving sun info: " + e.getMessage());
+        }
+    }
+    public static void saveAirPollution(String locationName, MyAirPollution airPollution) {
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement("INSERT INTO AirPollution (location, aqi, CO_index, NO_index, NO2_index, O3_index, SO2_index, PM2_5_index, PM10_index, NH3_index, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+            statement.setString(1, locationName);
+            statement.setInt(2, airPollution.aqi);
+            statement.setDouble(3, airPollution.CO_index);
+            statement.setDouble(4, airPollution.NO_index);
+            statement.setDouble(5, airPollution.NO2_index);
+            statement.setDouble(6, airPollution.O3_index);
+            statement.setDouble(7, airPollution.SO2_index);
+            statement.setDouble(8, airPollution.PM2_5_index);
+            statement.setDouble(9, airPollution.PM10_index);
+            statement.setDouble(10, airPollution.NH3_index);
+            statement.setDate(11, java.sql.Date.valueOf(LocalDate.now()));
+            statement.executeUpdate();
+        } catch (SQLException e)
+        {
+            System.out.println("Error saving air pollution data: " + e.getMessage());
+        }
+    }
+    public static List<MyBasicInfo> getBasicInfo(List<String> locationNames)
+    {
+        return getWeatherData(locationNames, (weatherData) -> new MyBasicInfo(weatherData.main_temp, weatherData.main_feels_like, weatherData.main_temp_min,
+                        weatherData.main_temp_max, weatherData.wind_speed,
+                        new MyLocation(weatherData.location_latitude, weatherData.location_longitude)));
+    }
+
+    public static List<MySunInfo> getSunInfo(List<String> locationNames)
+    {
+        return getSunData(locationNames, (sunData) -> new MySunInfo(sunData.sunrise, sunData.sunset));
+    }
+
+    public static List<MyAirPollution> getAirPollution(List<String> locationNames)
+    {
+        return getPollutionData(locationNames, (pollutedData) -> new MyAirPollution(pollutedData.aqi,
+                        pollutedData.CO_index, pollutedData.NO_index, pollutedData.NO2_index,
+                        pollutedData.O3_index, pollutedData.SO2_index, pollutedData.PM2_5_index,
+                        pollutedData.PM10_index, pollutedData.NH3_index));
+    }
+
+    private static List<MyWeatherData> getWeatherData(List<String> locationNames, Function<WeatherData, MyWeatherData> function)
+    {
+        List<MyWeatherData> weatherDataSet = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT location_name, main_temp, main_feels_like, main_temp_min, main_temp_max, wind_speed, location_latitude, location_longitude "
+                             + "FROM WeatherData "
+                             + "WHERE location_name = ANY (?)")) {
+
+            List<String> placeholders = new ArrayList<>();
+            for (int i = 0; i < locationNames.size(); i++) {
+                placeholders.add('?');
+            }
+
+            Object[] placeholdersArray = placeholders.toArray();
+            String sql = String.format("SELECT location_name, main_temp, main_feels_like, main_temp_min, main_temp_max, wind_speed, location_latitude, location_longitude "
+                            + "FROM WeatherData "
+                            + "WHERE location_name = ANY (:%d)",
+                    placeholders.size());
+
+            statement.setArray(1, connection.createArrayOf("VARCHAR", locationNames.toArray()));
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next())
+            {
+                MyWeatherData weatherData = function.apply(resultSet);
+                weatherDataSet.add(weatherData);
+            }
+        } catch (SQLException e)
+        {
+            System.out.println("Error getting weather data: " + e.getMessage());
+        }
+
+        return weatherDataSet;
+    }
+    private static List<MySunAqiData> getSunData(List<String> locationNames,Function<SunData, MySunAqiData> function)
+    {
+        List<MySunAqiData> sunAqiDataSet = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement
+                     (
+                     "SELECT location_name, sunrise, sunset "
+                             + "FROM SunInfo "
+                             + "WHERE location_name = ANY (?)"))
+        {
+            List<String> placeholders = new ArrayList<>();
+            for (int i = 0; i < locationNames.size(); i++) {
+                placeholders.add('?');
+            }
+            Object[] placeholdersArray = placeholders.toArray();
+            String sql = String.format("SELECT location_name, sunrise, sunset "
+                            + "FROM SunInfo "
+                            + "WHERE location_name = ANY (:%d)", placeholders.size());
+
+            statement.setArray(1, connection.createArrayOf("VARCHAR", locationNames.toArray()));
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next())
+            {
+                MySunAqiData sunAqiData = function.apply(resultSet);
+                sunAqiDataSet.add(sunAqiData);
+            }
+        } catch (SQLException e)
+        {
+            System.out.println("Error getting sun data: " + e.getMessage());
+        }
+        return sunAqiDataSet;
+    }
+    private static List<MyAirPollution> getPollutionData(List<String> locationNames, Function<PollutedData, MyAirPollution> function)
+    {
+        List<MyAirPollution> pollutionDataSet = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement
+                     (
+                     "SELECT location, aqi, CO_index, NO_index, NO2_index, O3_index, SO2_index, PM2_5_index, PM10_index, NH3_index "
+                             + "FROM AirPollution "
+                             + "WHERE location = ANY (?)"))
+        {
+            List<String> placeholders = new ArrayList<>();
+            for (int i = 0; i < locationNames.size(); i++) {
+                placeholders.add('?');
+            }
+            Object[] placeholdersArray = placeholders.toArray();
+            String sql = String.format("SELECT location, aqi, CO_index, NO_index, NO2_index, O3_index, SO2_index, PM2_5_index, PM10_index, NH3_index "
+                            + "FROM AirPollution "
+                            + "WHERE location = ANY (:%d)",
+                    placeholders.size());
+
+            statement.setArray(1, connection.createArrayOf("VARCHAR", locationNames.toArray()));
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                MyAirPollution pollutionData = function.apply(resultSet);
+                pollutionDataSet.add(pollutionData);
+            }
+        } catch (SQLException e)
+        {
+            System.out.println("Error getting pollution data: " + e.getMessage());
+        }
+        return pollutionDataSet;
+    }
+    record MyBasicInfo(double temp, double feels_like, double temp_min, double temp_max, double wind_speed, MyLocation location)
+    { }
+    record MyWeatherData(WeatherData data, double wind_speed, double location_latitude, double location_longitude) { }
+    record MyLocation(double latitude, double longitude) { }
+    record MySunInfo(String sunrise, String sunset) { }
+    record SunData(String sunrise, String sunset) { }
+    record MySunAqiData(MySunInfo sunInfo, MyAirPollution airPollution) { }
+    record MyAirPollution(int aqi, double CO_index, double NO_index, double NO2_index, double O3_index, double SO2_index, double PM2_5_index, double PM10_index, double NH3_index) { }
+    record PollutedData(int aqi, double CO_index, double NO_index, double NO2_index, double O3_index, double SO2_index, double PM2_5_index, double PM10_index, double NH3_index) { }
+    public static class WeatherData {
+        public String location_name;
+        public double main_temp;
+        public double main_feels_like;
+        public double main_temp_min;
+        public double main_temp_max;
+        public double wind_speed;
+        public double location;
+
+        public class WeatherDataFetcher {
+
+            private static final String jdbcUrl = "jdbc:sqlserver://DeathStrokeYT:1433;instanceName=<SQLEXPRESS01>;databaseName=WeatherAPP";
+            private static final String USER = "hassnain";
+            private static final String PASSWORD = "1122";
+
+            public static void main(String[] args) {
+                List<String> locationNames = List.of("New York", "Los Angeles", "Chicago");
+                List<MyBasicInfo> basicInfoDataSet = getBasicInfoData(locationNames);
+                List<MyWeatherData> weatherDataDataSet = getWeatherData(locationNames);
+                List<MySunAqiData> sunAqiDataSet = getSunAqiData(locationNames);
+                System.out.println("Basic Info Data Set: " + basicInfoDataSet);
+                System.out.println("Weather Data Set: " + weatherDataDataSet);
+                System.out.println("Sun Aqi Data Set: " + sunAqiDataSet);
+            }
+            private static List<MyBasicInfo> getBasicInfoData(List<String> locationNames) {
+                List<MyBasicInfo> basicInfoDataSet = new ArrayList<>();
+                try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+                     PreparedStatement statement = connection.prepareStatement(
+                             "SELECT location, temp, feels_like, temp_min, temp_max, wind_speed "
+                                     + "FROM BasicInfo "
+                                     + "WHERE location = ANY (?)")) {
+                    statement.setArray(1, connection.createArrayOf("VARCHAR", locationNames.toArray()));
+                    ResultSet resultSet = statement.executeQuery();
+                    while (resultSet.next()) {
+                        MyBasicInfo basicInfoData = new MyBasicInfo(
+                                resultSet.getDouble("temp"),
+                                resultSet.getDouble("feels_like"),
+                                resultSet.getDouble("temp_min"),
+                                resultSet.getDouble("temp_max"),
+                                resultSet.getDouble("wind_speed"),
+                                new MyLocation(resultSet.getDouble("latitude"), resultSet.getDouble("longitude")));
+                        basicInfoDataSet.add(basicInfoData);
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Error getting basic info data: " + e.getMessage());
+                }
+
+                return basicInfoDataSet;
+            }
+
+            private static List<MyWeatherData> getWeatherData(List<String> locationNames) {
+                List<MyWeatherData> weatherDataDataSet = new ArrayList<>();
+
+                try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+                     PreparedStatement statement = connection.prepareStatement(
+                             "SELECT location, main_temp, main_feels_like, main_temp_min, main_temp_max, wind_speed "
+                                     + "FROM WeatherData "
+                                     + "WHERE location = ANY (?)")) {
+
+                    statement.setArray(1, connection.createArrayOf("VARCHAR", locationNames.toArray()));
+
+                    ResultSet resultSet = statement.executeQuery();
+
+                    while (resultSet.next()) {
+                        MyWeatherData weatherData = new MyWeatherData(
+                                new WeatherData(
+                                        resultSet.getString("location_name"),
+                                        resultSet.getDouble("main_temp"),
+                                        resultSet.getDouble("main_feels_like"),
+                                        resultSet.getDouble("main_temp_min"),
+                                        resultSet.getDouble("main_temp_max"),
+                                        resultSet.getDouble("wind_speed"),
+                                        new MyLocation(resultSet.getDouble("latitude"), resultSet.getDouble("longitude"))),
+                                resultSet.getDouble("wind_speed"),
+                                resultSet.getDouble("latitude"),
+                                resultSet.getDouble("longitude"));
+
+                        weatherDataDataSet.add(weatherData);
+                    }
+                } catch (SQLException e) {
+                    System.out.println("Error getting weather data: " + e.getMessage());
+                }
+
+                return weatherDataDataSet;
+            }
+
+            private static List<MySunAqiData> getSunAqiData(List<String> locationNames) {
+                List<MySunAqiData> sunAqiDataSet = new ArrayList<>();
+
+                try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+                     PreparedStatement statement = connection.prepareStatement(
+                             "SELECT location, sunrise, sunset, aqi, co_index, no_index, no2_index, o3_index, so2_index, pm2_5_index, pm10_index, nh3_index, latitude, longitude "
+                                     + "FROM SunInfo s "
+                                     + "JOIN AqiData a ON s.location = a.location "
+                                     + "WHERE s.location = ANY (?)")) {
+
+                    statement.setArray(1, connection.createArrayOf("VARCHAR", locationNames.toArray()));
+
+                    ResultSet resultSet = statement.executeQuery();
+
+                    while (resultSet.next()) {
+                        MySunAqiData data = new MySunAqiData(
+                                new MySunData(
+                                        resultSet.get
+
+                        private static List<MySunAqiData> getSunAqiData(List<String> locationNames) {
+                            List<MySunAqiData> sunAqiDataSet = new ArrayList<>();
+
+                            try (Connection connection = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+                                 PreparedStatement statement = connection.prepareStatement(
+                                         "SELECT s.location, s.sunrise, s.sunset, a.aqi, a.co_index, a.no_index, a.no2_index, a.o3_index, a.so2_index, a.pm2_5_index, a.pm10_index, a.nh3_index, s.latitude, s.longitude "
+                                                 + "FROM SunInfo s "
+                                                 + "JOIN AqiData a ON s.location = a.location "
+                                                 + "WHERE s.location = ANY (?)")) {
+
+                                statement.setArray(1, connection.createArrayOf("VARCHAR", locationNames.toArray()));
+
+                                ResultSet resultSet = statement.executeQuery();
+
+                                while (resultSet.next()) {
+                                    MySunData sunData = new MySunData(
+                                            resultSet.getString("location"),
+                                            resultSet.getTimestamp("sunrise"),
+                                            resultSet.getTimestamp("sunset"),
+                                            new MyLocation(resultSet.getDouble("latitude"), resultSet.getDouble("longitude")));
+
+                                    MyAqiData aqiData = new MyAqiData(
+                                            resultSet.getInt("aqi"),
+                                            resultSet.getDouble("co_index"),
+                                            resultSet.getDouble("no_index"),
+                                            resultSet.getDouble("no2_index"),
+                                            resultSet.getDouble("o3_index"),
+                                            resultSet.getDouble("so2_index"),
+                                            resultSet.getDouble("pm2_5_index"),
+                                            resultSet.getDouble("pm10_index"),
+                                            resultSet.getDouble("nh3_index"));
+
+                                    MySunAqiData data = new MySunAqiData(sunData, aqiData);
+                                    sunAqiDataSet.add(data);
+                                }
+                            } catch (SQLException e) {
+                                System.out.println("Error getting sun AQI data: " + e.getMessage());
+                            }
+
+                            return sunAqiDataSet;
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+}
