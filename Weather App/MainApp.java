@@ -65,7 +65,7 @@ interface UserInterface {
 
     void showSunriseSunset(WeatherService weatherService,Location location,Storage storage);
 
-    void showWeatherForecast(WeatherService weatherService, UserInterface ui);
+    void showWeatherForecast(WeatherService weatherService, Location location,Storage storage)
 
     void showAirPollution(WeatherService weatherService,Location location,Storage storage);
 
@@ -87,6 +87,8 @@ interface Storage {
    void saveAirPollution(Location location,int aqi,AirQuality object);
    boolean checkAirPollution(Location location);
    boolean checkPollutingGases(Location location);
+   void saveForecastInfo(Location location,Forecast ForecastData);
+   boolean checkForecastInfo(Location location);
 
 }
 // * API Logic starts here
@@ -311,6 +313,9 @@ class WeatherData {
     public String getBase() {
         return base;
     }
+    public String getDtText() {
+        return dt_txt;
+    }
 
     public Main getMain() {
         return main;
@@ -351,9 +356,12 @@ class WeatherData {
     public int getCod() {
         return cod;
     }
+    public void setDtText(String s)
+    {
+        dt_txt=s;
+    }
 
 }
-
 // *Modified Forecast class to use it as my Api data store to store forecast data 
 
 class Forecast {
@@ -421,6 +429,14 @@ class City {
         this.sunset = 0;
     }
 
+    public void setName(String n)
+    {
+        name=n;
+    }
+    public void setCName(String n)
+    {
+        country=n;
+    }
     public int getId() {
         return id;
     }
@@ -1035,8 +1051,31 @@ class TerminalUI implements UserInterface {
     }
 
     @Override
-    public void showWeatherForecast(WeatherService weatherService, UserInterface ui) {
+    public void showWeatherForecast(WeatherService weatherService, Location location,Storage storage) {
         // Implement as required
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+
+        Forecast ForecastData = weatherService.getForecastData(myloc);
+        List<WeatherData> list=ForecastData.getList();
+         // ! This returns a list of 40 weather forecase for the next 5 days each list
+        // contains forecast of 3hrs
+        System.out.println("Weather Forecast for 5 days : ");
+        int i=0;
+        for (WeatherData weather : list) {
+
+            System.out.println(++i+":\n\tWeather: " + weather.getWeather().get(0).getMain()+
+            ":\n\tDescription: " + weather.getWeather().get(0).getDescription()+
+            ":\n\tTemperature: " + weather.getMain().getTemp()+
+            ":\n\tPressure: " + weather.getMain().getPressure()+
+            ":\n\tHumidity: " + weather.getMain().getHumidity()+
+            ":\n\tFeels Like: " + weather.getMain().getFeelsLike()+
+            ":\n\tMinimum Temperature: " + weather.getMain().getTempMin()+
+            ":\n\tMaximum Temperature: " + weather.getMain().getTempMax()+
+            ":\n\tWind Speed: " + weather.getWind().getSpeed()+
+            ":\n\tTime of Data Forecasted: " + weather.getDtText()+"\n");
+          }
+          System.out.println("City Name: "+ForecastData.getCity().getName()+"\nCountry Name: "+ForecastData.getCity().getCountry());
+          storage.saveForecastInfo(location,ForecastData);
     }
 
     @Override
@@ -1098,7 +1137,6 @@ class Location {
 
 class FileStorage implements Storage {
 
-    //same function for air pollution data and air pollution gases data
     @Override
     public void saveAirPollution(Location location,int aqi,AirQuality object)
     {
@@ -1141,7 +1179,6 @@ class FileStorage implements Storage {
     @Override
    public boolean checkAirPollution(Location location)
    {
-    //function to check existing data in file
     String delimiter = ",";  // Word to stop reading
     int numberOfLines = 0;
     LocalDate today = LocalDate.now();
@@ -1267,6 +1304,148 @@ class FileStorage implements Storage {
         "\nPM10: "+arr1[index].getPm10()+"\nNH3: "+arr1[index].getNh3());
     return true;
    
+
+   }
+   @Override
+   public void saveForecastInfo(Location location,Forecast ForecastData)
+   {
+    try {
+
+        File myFile = new File("ForecastInfo.txt");
+        FileWriter writer = new FileWriter(myFile,true);
+        LocalDate today = LocalDate.now();
+        writer.write(location.getName());
+        writer.write(",");
+        for (WeatherData weather : ForecastData.getList()) {
+
+        writer.write(weather.getWeather().get(0).getMain());
+        writer.write(",");
+        writer.write(weather.getWeather().get(0).getDescription());
+        writer.write(",");
+        writer.write(String.valueOf( weather.getMain().getTemp()));
+        writer.write(",");
+        writer.write(String.valueOf(weather.getMain().getPressure()));
+        writer.write(",");
+        writer.write(String.valueOf(weather.getMain().getHumidity()));
+        writer.write(",");
+        writer.write(String.valueOf(weather.getMain().getFeelsLike()));
+        writer.write(",");
+        writer.write(String.valueOf(weather.getMain().getTempMin()));
+        writer.write(",");
+        writer.write(String.valueOf(weather.getMain().getTempMax()));
+        writer.write(",");
+        writer.write(String.valueOf(weather.getWind().getSpeed()));
+        writer.write(",");
+        writer.write(weather.getDtText());
+        writer.write(",");
+        }
+
+        writer.write(ForecastData.getCity().getName());
+        writer.write(",");
+        writer.write(ForecastData.getCity().getCountry());
+        writer.write(",");
+        writer.write(String.valueOf(today));
+        writer.write("\n");
+        writer.close();
+    } 
+      catch (IOException e) 
+      {
+        System.err.println("Error writing to file: " + e.getMessage());
+      }
+
+   }
+
+   @Override
+   public boolean checkForecastInfo(Location location)
+   {
+    String delimiter = ",";  // Word to stop reading
+    int numberOfLines = 0;
+    LocalDate today = LocalDate.now();
+    boolean check=false;
+   try{
+        LineNumberReader reader = new LineNumberReader(new FileReader("ForecastInfo.txt"));
+        while (reader.readLine() != null) {
+            numberOfLines++;
+        }
+        reader.close();
+        
+    }
+        catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        }
+        WeatherData[][] array = new WeatherData[numberOfLines][40];
+        City[] arr= new City[numberOfLines];
+        Main[] arr1= new Main[numberOfLines];
+   try{
+      Scanner scanner = new Scanner(new File("ForecastInfo.txt"));
+      scanner.useDelimiter(delimiter);  // Set delimiter for splitting
+
+      for( int i=0;i<arr.length;i++)
+      {
+        arr[i] = new City();
+        arr1[i] = new Main();
+
+          arr1[i].setLocation(scanner.next());
+
+          for(int j=0;j<40;j++)
+          {
+            array[i][j].getWeather().get(0).setMain(scanner.next());
+            array[i][j].getWeather().get(0).setDescription(scanner.next());
+            array[i][j].getMain().setTemp(Double.parseDouble(scanner.next()));
+            array[i][j].getMain().setPressure(Integer.parseInt(scanner.next()));
+            array[i][j].getMain().setHumidity(Integer.parseInt(scanner.next()));
+            array[i][j].getMain().setFeelsike(Double.parseDouble(scanner.next()));
+            array[i][j].getMain().setTemp_Min(Double.parseDouble(scanner.next()));
+            array[i][j].getMain().setTemp_Max(Double.parseDouble(scanner.next()));
+            array[i][j].getWind().setSpeed(Double.parseDouble(scanner.next()));
+            array[i][j].setDtText(scanner.next());
+          }
+          arr[i].setName(scanner.next());
+          arr[i].setCName(scanner.next());
+          String firstLine = scanner.nextLine();
+          arr1[i].setDate(firstLine.substring(1));
+
+      }
+      scanner.close();
+    }
+      catch (FileNotFoundException e) {
+        System.err.println("Error opening file:  " + e.getMessage());
+    }
+    int index=0;
+    for(int i=0;i<arr.length;i++)
+    {
+        
+        if(arr1[i].getLocation().equalsIgnoreCase(location.getName()))
+        {
+            if(arr1[i].getDate().equals(String.valueOf(today)))
+            {
+                check=true;
+                index=i;
+
+            }
+        }
+    }
+    if(check==false)
+    {
+        return false;
+    }
+    System.out.println("Weather Forecast for 5 days : ");
+    int i=0;
+    for (int j=0;j<40;j++) {
+
+        System.out.println(++i+":\n\tWeather: " + array[index][j].getWeather().get(0).getMain()+
+        ":\n\tDescription: " + array[index][j].getWeather().get(0).getDescription()+
+        ":\n\tTemperature: " + array[index][j].getMain().getTemp()+
+        ":\n\tPressure: " + array[index][j].getMain().getPressure()+
+        ":\n\tHumidity: " + array[index][j].getMain().getHumidity()+
+        ":\n\tFeels Like: " + array[index][j].getMain().getFeelsLike()+
+        ":\n\tMinimum Temperature: " + array[index][j].getMain().getTempMin()+
+        ":\n\tMaximum Temperature: " + array[index][j].getMain().getTempMax()+
+        ":\n\tWind Speed: " + array[index][j].getWind().getSpeed()+
+        ":\n\tTime of Data Forecasted: " + array[index][j].getDtText()+"\n");
+      }
+      System.out.println("City Name: "+arr[index].getName()+"\nCountry Name: "+arr[index].getCountry());
+    return true;
 
    }
 
@@ -1545,10 +1724,7 @@ class FileStorage implements Storage {
         "\nPressure: "+arr[index].getPressure()+"\nHumidity: "+arr[index].getHumidity()+"\nSpeed: "+arr2[index].getSpeed());
         return true;
     }
-    @Override
-    public void saveWeatherData(Location location, WeatherData data) {
-        // Not implemented in this example, could store weather data per location
-    }
+  
 
     @Override
     public void saveLocation(Location location) {
@@ -1556,6 +1732,7 @@ class FileStorage implements Storage {
         locations.add(location);
         writeLocationsToFile(locations);
     }
+
     @Override
     public List<Location> getLocations() {
         File file = new File(storageFile);
@@ -1697,8 +1874,14 @@ class MainApp {
                     break;
                }
                 case 4:
-                    ui.showWeatherForecast(weatherService, ui);
+                {
+                    boolean check=storage.checkForecastInfo(location);
+                    if(check==false)
+                    {
+                    ui.showWeatherForecast(weatherService, location, storage);
+                    }
                     break;
+               }
                 case 5:
                 {
                     boolean check=storage.checkAirPollution(location);
