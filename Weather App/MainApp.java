@@ -132,7 +132,8 @@ class WeatherServiceImpl implements WeatherService {
             e.printStackTrace();
         }
 
-        System.out.println(response.body());
+//        Commented it just for testing purposes 
+//        System.out.println(response.body());
 
         return response.body();
     }
@@ -889,6 +890,8 @@ class Sys {
     public long sunrise;
     public long sunset;
     public String pod;
+
+    public String country;
     String location;
     String date;
 
