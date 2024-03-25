@@ -1,9 +1,15 @@
+------ Read me---
+Go and creeate a new Data Base in MSSQl server with Name WeatherAPP--
+then create these tables using a query 
+
+
 CREATE TABLE Locations (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   latitude DECIMAL(9, 6) NOT NULL,
   longitude DECIMAL(9, 6) NOT NULL
 );
+
 
 CREATE TABLE WeatherData (
   id SERIAL PRIMARY KEY,
