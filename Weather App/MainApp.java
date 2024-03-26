@@ -37,8 +37,8 @@ import java.util.Date;
 
 interface UserInterface {
 
-
     Location getLocationName();
+
     Location getLocationCoord();
 
     int getMenuChoice();
@@ -76,7 +76,7 @@ interface Storage {
     boolean checkSunInfo(Location location);
 
     void saveCurrentInfo(Location location, String main, String description, double temp, int pressure, int humidity,
-                         double speed);
+            double speed);
 
     boolean checkCurrentInfo(Location location);
 
@@ -89,7 +89,6 @@ interface Storage {
     void saveForecastInfo(Location location, Forecast ForecastData);
 
     boolean checkForecastInfo(Location location);
-
 
 }
 
@@ -107,10 +106,14 @@ interface WeatherService {
 
     // Get Forecast for 5 next days
     Forecast getForecastData(Coord location);
+
+    // TODO Resolve Error
     Forecast getForecastData(String country);
 
     // Air polution for certain longitude and latitide
     AirPollution getPollutionData(Coord locattion);
+
+    // TODO Resolve Error
     AirPollution getPollutionData(String country);
 }
 
@@ -118,6 +121,11 @@ class WeatherServiceImpl implements WeatherService {
 
     private static String api;
     WeatherData myweatherData;
+
+    public WeatherServiceImpl() {
+        this.api = "";
+        this.myweatherData = new WeatherData();
+    }
 
     public WeatherServiceImpl(String api) {
         this.api = api;
@@ -191,11 +199,12 @@ class WeatherServiceImpl implements WeatherService {
         }
         return myweatherData;
     }
+
+    // TODO Error Resolve
     @Override
     public Forecast getForecastData(String country) {
 
         Forecast myforecastData = new Forecast();
-
 
         api = "https://api.openweathermap.org/data/2.5/forecast?q=" + country
                 + "&appid=109a96ae51ebbed7fa95540a48ba65b2";
@@ -206,6 +215,7 @@ class WeatherServiceImpl implements WeatherService {
 
         try {
             myforecastData = mapper.readValue(res, Forecast.class);
+
         } catch (IOException e) {
             System.out.println(e);
         }
@@ -213,6 +223,7 @@ class WeatherServiceImpl implements WeatherService {
         return myforecastData;
 
     }
+
     @Override
     public Forecast getForecastData(Coord location) {
 
@@ -237,6 +248,8 @@ class WeatherServiceImpl implements WeatherService {
         return myforecastData;
 
     }
+
+    // TODO Error resolve
     @Override
     public AirPollution getPollutionData(String country) {
 
@@ -304,7 +317,7 @@ class WeatherData {
     public String dt_txt;
 
     public WeatherData(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
-                       Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
+            Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
         this.coord = coord;
         this.weather = weather;
         this.base = base;
@@ -448,7 +461,7 @@ class City {
     public long sunset;
 
     public City(int id, String name, Coord coord, String country, int population, int timezone, long sunrise,
-                long sunset) {
+            long sunset) {
         this.id = id;
         this.name = name;
         this.coord = coord;
@@ -798,7 +811,7 @@ class Main {
     }
 
     public Main(double temp, double feels_like, double temp_min, double temp_max, int pressure, int humidity,
-                int sea_level, int grnd_level, int temp_kf) {
+            int sea_level, int grnd_level, int temp_kf) {
         this.temp = temp;
         this.feels_like = feels_like;
         this.temp_min = temp_min;
@@ -984,11 +997,11 @@ class Sys {
         return date;
     }
 }
+
 // * API logic ends here
 
 class TerminalUI implements UserInterface {
     private final Scanner scanner = new Scanner(System.in);
-
 
     @Override
     public Location getLocationCoord() {
@@ -1001,12 +1014,12 @@ class TerminalUI implements UserInterface {
         scanner.nextLine(); // Consume newline character
         return new Location("", latitude, longitude);
     }
+
     @Override
     public Location getLocationName() {
         System.out.println("Enter location details:");
         System.out.print("  Name: ");
         String name = scanner.nextLine();
-        scanner.nextLine(); // Consume newline character
         return new Location(name, 0.0, 0.0);
     }
 
@@ -1024,7 +1037,6 @@ class TerminalUI implements UserInterface {
         return scanner.nextInt();
     }
 
-
     @Override
     public void showCurrentWeather(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
@@ -1035,11 +1047,10 @@ class TerminalUI implements UserInterface {
         int humidity;
         double speed;
         WeatherData Data;
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
             Data = weatherService.getWeatherData(myloc);
-        }
-        else {
+        } else {
             Data = weatherService.getWeatherData(location.getName());
         }
         temp = Data.getMain().getTemp();
@@ -1062,11 +1073,10 @@ class TerminalUI implements UserInterface {
         double temp_min;
         double temp_max;
         WeatherData Data;
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
             Data = weatherService.getWeatherData(myloc);
-        }
-        else {
+        } else {
             Data = weatherService.getWeatherData(location.getName());
         }
         feels_like = Data.getMain().getFeelsLike();
@@ -1084,11 +1094,10 @@ class TerminalUI implements UserInterface {
         long sun_rise;
         long sun_set;
         WeatherData Data;
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
             Data = weatherService.getWeatherData(myloc);
-        }
-        else {
+        } else {
             Data = weatherService.getWeatherData(location.getName());
         }
         sun_rise = Data.getSys().getSunrise();
@@ -1110,16 +1119,14 @@ class TerminalUI implements UserInterface {
     public void showWeatherForecast(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         Forecast ForecastData;
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
             ForecastData = weatherService.getForecastData(myloc);
-        }
-        else {
+        } else {
             ForecastData = weatherService.getForecastData(location.getName());
         }
 
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
-
 
         List<WeatherData> list = ForecastData.getList();
         // ! This returns a list of 40 weather forecase for the next 5 days each list
@@ -1147,11 +1154,10 @@ class TerminalUI implements UserInterface {
     public void showAirPollution(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         AirPollution MyPollutionData;
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
             MyPollutionData = weatherService.getPollutionData(myloc);
-        }
-        else {
+        } else {
             MyPollutionData = weatherService.getPollutionData(location.getName());
         }
 
@@ -1165,11 +1171,10 @@ class TerminalUI implements UserInterface {
     public void showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         AirPollution MyPollutionData;
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
             MyPollutionData = weatherService.getPollutionData(myloc);
-        }
-        else {
+        } else {
             MyPollutionData = weatherService.getPollutionData(location.getName());
         }
 
@@ -1187,8 +1192,8 @@ class TerminalUI implements UserInterface {
 
 class Location {
     private String name;
-    private  double latitude;
-    private  double longitude;
+    private double latitude;
+    private double longitude;
 
     public Location() {
         this.name = "";
@@ -1213,17 +1218,19 @@ class Location {
     public double getLongitude() {
         return longitude;
     }
+
     public void setLatitude(double l) {
-        latitude=l;
+        latitude = l;
     }
 
     public void setLongitude(double l) {
-        longitude=l;
+        longitude = l;
     }
 
     public void setName(String l) {
-        name=l;
+        name = l;
     }
+
     @Override
     public String toString() {
         return "Location{" +
@@ -1242,14 +1249,12 @@ class FileStorage implements Storage {
             File myFile;
             FileWriter writer;
             LocalDate today = LocalDate.now();
-            if(location.getName()!="") {
+            if (location.getName() != "") {
                 myFile = new File("AirPollution.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(location.getName());
                 writer.write(",");
-            }
-            else
-            {
+            } else {
                 myFile = new File("AirPollution1.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(String.valueOf(location.getLatitude()));
@@ -1289,7 +1294,7 @@ class FileStorage implements Storage {
         String delimiter = ","; // Word to stop reading
         int numberOfLines = 0;
         LocalDate today = LocalDate.now();
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("AirPollution1.txt"));
@@ -1324,7 +1329,8 @@ class FileStorage implements Storage {
             int index = 0;
             for (int i = 0; i < arr.length; i++) {
 
-                if (arr1[i].getLatitude()==location.getLatitude() && arr1[i].getLongitude()==location.getLongitude() ) {
+                if (arr1[i].getLatitude() == location.getLatitude()
+                        && arr1[i].getLongitude() == location.getLongitude()) {
                     if (arr[i].getDate().equals(String.valueOf(today))) {
                         check = true;
                         index = i;
@@ -1338,8 +1344,7 @@ class FileStorage implements Storage {
             System.out.print("\n***************Data fetched from FILE****************");
             System.out.println("\nAir Pollution Data: \nAir Quality Index: " + arr[index].getAqi());
             return true;
-        }
-        else {
+        } else {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("AirPollution.txt"));
@@ -1395,8 +1400,8 @@ class FileStorage implements Storage {
         String delimiter = ","; // Word to stop reading
         int numberOfLines = 0;
         LocalDate today = LocalDate.now();
-        if(location.getName()=="") {
-            boolean check=false;
+        if (location.getName() == "") {
+            boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("AirPollution1.txt"));
                 while (reader.readLine() != null) {
@@ -1441,7 +1446,8 @@ class FileStorage implements Storage {
 
             for (int i = 0; i < arr.length; i++) {
 
-                if (arr2[i].getLatitude()==location.getLatitude() && arr2[i].getLongitude()==location.getLongitude() ) {
+                if (arr2[i].getLatitude() == location.getLatitude()
+                        && arr2[i].getLongitude() == location.getLongitude()) {
                     if (arr[i].getDate().equals(String.valueOf(today))) {
                         check = true;
                         index = i;
@@ -1455,15 +1461,16 @@ class FileStorage implements Storage {
             }
             System.out.print("\n***************Data fetched from FILE****************");
 
-            System.out.println("\nDetails Of Polluting Gases: \nCO: " + arr1[index].getCo() + "\nNO: " + arr1[index].getNo()
-                    + "\nNO2: " + arr1[index].getNo2() +
-                    "\nO3: " + arr1[index].getO3() + "\nSO2: " + arr1[index].getSo2() + "\nPM2_5: " + arr1[index].getPm2_5()
-                    +
-                    "\nPM10: " + arr1[index].getPm10() + "\nNH3: " + arr1[index].getNh3());
+            System.out.println(
+                    "\nDetails Of Polluting Gases: \nCO: " + arr1[index].getCo() + "\nNO: " + arr1[index].getNo()
+                            + "\nNO2: " + arr1[index].getNo2() +
+                            "\nO3: " + arr1[index].getO3() + "\nSO2: " + arr1[index].getSo2() + "\nPM2_5: "
+                            + arr1[index].getPm2_5()
+                            +
+                            "\nPM10: " + arr1[index].getPm10() + "\nNH3: " + arr1[index].getNh3());
             return true;
-        }
-        else {
-            boolean check=false;
+        } else {
+            boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("AirPollution.txt"));
                 while (reader.readLine() != null) {
@@ -1518,11 +1525,13 @@ class FileStorage implements Storage {
                 return false;
             }
             System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println("\nDetails Of Polluting Gases: \nCO: " + arr1[index].getCo() + "\nNO: " + arr1[index].getNo()
-                    + "\nNO2: " + arr1[index].getNo2() +
-                    "\nO3: " + arr1[index].getO3() + "\nSO2: " + arr1[index].getSo2() + "\nPM2_5: " + arr1[index].getPm2_5()
-                    +
-                    "\nPM10: " + arr1[index].getPm10() + "\nNH3: " + arr1[index].getNh3());
+            System.out.println(
+                    "\nDetails Of Polluting Gases: \nCO: " + arr1[index].getCo() + "\nNO: " + arr1[index].getNo()
+                            + "\nNO2: " + arr1[index].getNo2() +
+                            "\nO3: " + arr1[index].getO3() + "\nSO2: " + arr1[index].getSo2() + "\nPM2_5: "
+                            + arr1[index].getPm2_5()
+                            +
+                            "\nPM10: " + arr1[index].getPm10() + "\nNH3: " + arr1[index].getNh3());
             return true;
         }
     }
@@ -1534,14 +1543,12 @@ class FileStorage implements Storage {
             File myFile;
             FileWriter writer;
             LocalDate today = LocalDate.now();
-            if(location.getName()!="") {
+            if (location.getName() != "") {
                 myFile = new File("ForecastInfo.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(location.getName());
                 writer.write(",");
-            }
-            else
-            {
+            } else {
                 myFile = new File("ForecastInfo1.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(String.valueOf(location.getLatitude()));
@@ -1588,7 +1595,7 @@ class FileStorage implements Storage {
         String delimiter = ","; // Word to stop reading
         int numberOfLines = 0;
         LocalDate today = LocalDate.now();
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("ForecastInfo1.txt"));
@@ -1651,7 +1658,8 @@ class FileStorage implements Storage {
             int index = 0;
             for (int i = 0; i < arr1.length; i++) {
 
-                if (arr2[i].getLatitude()==location.getLatitude() && arr2[i].getLongitude()==location.getLongitude()) {
+                if (arr2[i].getLatitude() == location.getLatitude()
+                        && arr2[i].getLongitude() == location.getLongitude()) {
                     if (arr1[i].getDate().equals(String.valueOf(today))) {
                         check = true;
                         index = i;
@@ -1679,8 +1687,7 @@ class FileStorage implements Storage {
                         ":\n\tTime of Data Forecasted: " + array[index][j].getDtText() + "\n");
             }
             return true;
-        }
-        else {
+        } else {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("ForecastInfo.txt"));
@@ -1779,14 +1786,12 @@ class FileStorage implements Storage {
             File myFile;
             FileWriter writer;
             LocalDate today = LocalDate.now();
-            if(location.getName()!="") {
+            if (location.getName() != "") {
                 myFile = new File("BasicInfo.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(location.getName());
                 writer.write(",");
-            }
-            else
-            {
+            } else {
                 myFile = new File("BasicInfo1.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(String.valueOf(location.getLatitude()));
@@ -1813,7 +1818,7 @@ class FileStorage implements Storage {
         String delimiter = ","; // Word to stop reading
         int numberOfLines = 0;
         LocalDate today = LocalDate.now();
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("BasicInfo1.txt"));
@@ -1850,7 +1855,8 @@ class FileStorage implements Storage {
             int index = 0;
             for (int i = 0; i < arr.length; i++) {
 
-                if (arr2[i].getLatitude()==location.getLatitude() && arr2[i].getLongitude()==location.getLongitude()) {
+                if (arr2[i].getLatitude() == location.getLatitude()
+                        && arr2[i].getLongitude() == location.getLongitude()) {
                     if (arr[i].getDate().equals(String.valueOf(today))) {
                         check = true;
                         index = i;
@@ -1865,8 +1871,7 @@ class FileStorage implements Storage {
             System.out.println("\nFeels Like: " + arr[index].getFeelsLike() + "\nMinimum Temperature: "
                     + arr[index].getTempMin() + "\nMaximum Temperature: " + arr[index].getTempMax());
             return true;
-        }
-        else {
+        } else {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("BasicInfo.txt"));
@@ -1926,14 +1931,12 @@ class FileStorage implements Storage {
             File myFile;
             FileWriter writer;
             LocalDate today = LocalDate.now();
-            if(location.getName()!="") {
+            if (location.getName() != "") {
                 myFile = new File("SunInfo.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(location.getName());
                 writer.write(",");
-            }
-            else
-            {
+            } else {
                 myFile = new File("SunInfo1.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(String.valueOf(location.getLatitude()));
@@ -1959,7 +1962,7 @@ class FileStorage implements Storage {
         String delimiter = ","; // Word to stop reading
         int numberOfLines = 0;
         LocalDate today = LocalDate.now();
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("SunInfo1.txt"));
@@ -1997,7 +2000,8 @@ class FileStorage implements Storage {
             int index = 0;
             for (int i = 0; i < arr.length; i++) {
 
-                if (arr2[i].getLatitude()==location.getLatitude() && arr2[i].getLongitude()==location.getLongitude()) {
+                if (arr2[i].getLatitude() == location.getLatitude()
+                        && arr2[i].getLongitude() == location.getLongitude()) {
                     if (arr[i].getDate().equals(String.valueOf(today))) {
                         check = true;
                         index = i;
@@ -2011,8 +2015,7 @@ class FileStorage implements Storage {
             System.out.print("\n***************Data fetched from FILE****************");
             System.out.println("\nSun Rise Time: " + Sunrise[index] + "\nSun Set Time: " + Sunset[index]);
             return true;
-        }
-        else {
+        } else {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("SunInfo.txt"));
@@ -2067,20 +2070,18 @@ class FileStorage implements Storage {
 
     @Override
     public void saveCurrentInfo(Location location, String main, String description, double temp, int pressure,
-                                int humidity, double speed) {
+            int humidity, double speed) {
         try {
 
             File myFile;
             FileWriter writer;
             LocalDate today = LocalDate.now();
-            if(location.getName()!="") {
+            if (location.getName() != "") {
                 myFile = new File("CurrentInfo.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(location.getName());
                 writer.write(",");
-            }
-            else
-            {
+            } else {
                 myFile = new File("CurrentInfo1.txt");
                 writer = new FileWriter(myFile, true);
                 writer.write(String.valueOf(location.getLatitude()));
@@ -2114,7 +2115,7 @@ class FileStorage implements Storage {
         String delimiter = ","; // Word to stop reading
         int numberOfLines = 0;
         LocalDate today = LocalDate.now();
-        if(location.getName()=="") {
+        if (location.getName() == "") {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("CurrentInfo1.txt"));
@@ -2158,7 +2159,8 @@ class FileStorage implements Storage {
             int index = 0;
             for (int i = 0; i < arr.length; i++) {
 
-                if (arr3[i].getLatitude()==location.getLatitude() && arr3[i].getLongitude()==location.getLongitude()) {
+                if (arr3[i].getLatitude() == location.getLatitude()
+                        && arr3[i].getLongitude() == location.getLongitude()) {
                     if (arr[i].getDate().equals(String.valueOf(today))) {
                         check = true;
                         index = i;
@@ -2175,8 +2177,7 @@ class FileStorage implements Storage {
                     "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
                     + arr2[index].getSpeed());
             return true;
-        }
-        else {
+        } else {
             boolean check = false;
             try {
                 LineNumberReader reader = new LineNumberReader(new FileReader("CurrentInfo.txt"));
@@ -2236,9 +2237,9 @@ class FileStorage implements Storage {
             return true;
         }
     }
+
     @Override
-    public void saveLocationCoord(Location location)
-    {
+    public void saveLocationCoord(Location location) {
         File file = new File("LocationCoord.txt");
         if (file.exists()) {
             String delimiter = ","; // Word to stop reading
@@ -2274,10 +2275,10 @@ class FileStorage implements Storage {
             int index = 0;
             for (int i = 0; i < arr.length; i++) {
 
-                if (arr[i].getLatitude() == location.getLatitude() && arr[i].getLongitude() == location.getLongitude()) {
+                if (arr[i].getLatitude() == location.getLatitude()
+                        && arr[i].getLongitude() == location.getLongitude()) {
 
                     check = true;
-
 
                 }
             }
@@ -2298,8 +2299,7 @@ class FileStorage implements Storage {
             } else {
                 return;
             }
-        }
-        else {
+        } else {
             try {
 
                 File myFile = new File("LocationCoord.txt");
@@ -2316,9 +2316,9 @@ class FileStorage implements Storage {
         }
 
     }
+
     @Override
-    public Location getLocationCoord()
-    {
+    public Location getLocationCoord() {
         String delimiter = ","; // Word to stop reading
         int numberOfLines = 0;
         Scanner scanner1 = new Scanner(System.in);
@@ -2351,26 +2351,25 @@ class FileStorage implements Storage {
         }
         int index = 0;
         for (int i = 0; i < arr.length; i++) {
-            System.out.println(i+1+".\tLatitude: " + arr[i].getLatitude() + " Longitude:  " + arr[i].getLongitude()+"\n");
+            System.out.println(
+                    i + 1 + ".\tLatitude: " + arr[i].getLatitude() + " Longitude:  " + arr[i].getLongitude() + "\n");
         }
         int option;
-        while(true) {
+        while (true) {
             System.out.print("\nEnter your choice: ");
             option = scanner1.nextInt();
-            if(option<=0 || option>arr.length){
+            if (option <= 0 || option > arr.length) {
                 System.out.print("\nYou entered invalid choice!! ");
-            }
-            else {
+            } else {
                 break;
             }
         }
-        return new Location("",arr[option-1].getLatitude(),arr[option-1].getLongitude());
-
+        return new Location("", arr[option - 1].getLatitude(), arr[option - 1].getLongitude());
 
     }
+
     @Override
-    public void saveLocationName(Location location)
-    {
+    public void saveLocationName(Location location) {
         File file = new File("LocationName.txt");
         if (file.exists()) {
             int numberOfLines = 0;
@@ -2406,7 +2405,6 @@ class FileStorage implements Storage {
 
                     check = true;
 
-
                 }
             }
             if (check == false) {
@@ -2424,8 +2422,7 @@ class FileStorage implements Storage {
                 System.out.println("hello");
                 return;
             }
-        }
-        else{
+        } else {
             try {
 
                 File myFile = new File("LocationName.txt");
@@ -2438,8 +2435,9 @@ class FileStorage implements Storage {
             }
         }
     }
+
     @Override
-    public Location getLocationName(){
+    public Location getLocationName() {
         int numberOfLines = 0;
         Scanner scanner1 = new Scanner(System.in);
         boolean check = false;
@@ -2467,21 +2465,19 @@ class FileStorage implements Storage {
         }
         int index = 0;
         for (int i = 0; i < arr.length; i++) {
-            System.out.println(i+1+".\tLocation: " + arr[i].getName()+"\n");
+            System.out.println(i + 1 + ".\tLocation: " + arr[i].getName() + "\n");
         }
         int option;
-        while(true) {
+        while (true) {
             System.out.print("\nEnter your choice: ");
             option = scanner1.nextInt();
-            if(option<=0 || option>arr.length){
+            if (option <= 0 || option > arr.length) {
                 System.out.print("\nYou entered invalid choice!! ");
-            }
-            else {
+            } else {
                 break;
             }
         }
-        return new Location(arr[option-1].getName(),0.0,0.0);
-
+        return new Location(arr[option - 1].getName(), 0.0, 0.0);
 
     }
 }
@@ -2519,44 +2515,48 @@ class MainApp {
     public static void main(String[] args) {
         UserInterface ui = new TerminalUI();
         Storage storage = new FileStorage();
-        WeatherService weatherService = new WeatherServiceImpl(
-                "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=109a96ae51ebbed7fa95540a48ba65b2"); // Replace
-        // with
-        // actual
-        // API
-        // implementation
+        WeatherService weatherService = new WeatherServiceImpl(); // Replace
 
         // List<Location> locationsByLatLng = ui.getLocationsByLatLngInput();
-
         // // Get multiple locations by city/country name
         // List<Location> locationsByCity = ui.getLocationsByCityInput();
+
         int option;
         Scanner scanner1 = new Scanner(System.in);
-        Location location=new Location();
+        Location location = new Location();
 
-        while(true) {
+        while (true) {
 
             System.out.print("\nPress 1 if you want to check weather with Latitude and longitude ");
             System.out.print("\nPress 2 if you want to check weather with city/country name ");
             System.out.print("\nEnter your choice: ");
+
             option = scanner1.nextInt();
-            if(option==1){
-                while(true) {
+
+            if (option == 1) {
+
+                while (true) {
+
                     int obj;
                     System.out.print("\nPress 1 if you want to add new Latitude and longitude ");
                     System.out.print("\nPress 2 if you want to use saved Latitude and longitude ");
                     System.out.print("\nEnter your choice: ");
+
                     obj = scanner1.nextInt();
+
                     if (obj == 1) {
                         location = ui.getLocationCoord();
                         storage.saveLocationCoord(location);
                         break;
                     } else if (obj == 2) {
+
                         File file = new File("LocationCoord.txt");
+
                         if (file.exists()) {
                             location = storage.getLocationCoord();
                             break;
                         }
+
                         else {
                             System.out.print("\nNo saved Longitude and Latitude!!");
                         }
@@ -2568,26 +2568,27 @@ class MainApp {
 
                 }
                 break;
-            }
-            else if(option==2)
-            {
-                while(true) {
+            } else if (option == 2) {
+                while (true) {
                     int obj;
                     System.out.print("\nPress 1 if you want to add new city/country name ");
                     System.out.print("\nPress 2 if you want to use saved city/country name ");
                     System.out.print("\nEnter your choice: ");
+
                     obj = scanner1.nextInt();
+
                     if (obj == 1) {
                         location = ui.getLocationName();
                         storage.saveLocationName(location);
                         break;
                     } else if (obj == 2) {
+
                         File file = new File("LocationName.txt");
+
                         if (file.exists()) {
                             location = storage.getLocationName();
                             break;
-                        }
-                        else {
+                        } else {
                             System.out.print("\nNo saved Locations!!");
                         }
                     } else {
@@ -2597,12 +2598,9 @@ class MainApp {
 
                 }
                 break;
-            }
-            else {
+            } else {
                 System.out.print("\nYou Entered an invalid choice!! ");
-
             }
-
         }
 
         while (true) {
@@ -2612,11 +2610,12 @@ class MainApp {
             switch (choice) {
 
                 case 1: {
+
                     File file;
-                    if(location.getName()!="") {
+                    if (location.getName() != "") {
+
                         file = new File("CurrentInfo.txt");
-                    }
-                    else {
+                    } else {
                         file = new File("CurrentInfo1.txt");
                     }
                     if (file.exists()) {
@@ -2626,10 +2625,10 @@ class MainApp {
                         if (check == false) {
                             ui.showCurrentWeather(weatherService, location, storage);
                         }
-                    }
-                    else {
+                    } else {
                         ui.showCurrentWeather(weatherService, location, storage);
                     }
+
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
                     char inputChar = scanner.next().charAt(0);
@@ -2639,10 +2638,9 @@ class MainApp {
 
                 case 2: {
                     File file;
-                    if(location.getName()!="") {
+                    if (location.getName() != "") {
                         file = new File("BasicInfo.txt");
-                    }
-                    else {
+                    } else {
                         file = new File("BasicInfo1.txt");
                     }
                     if (file.exists()) {
@@ -2663,10 +2661,9 @@ class MainApp {
                 case 3: {
 
                     File file;
-                    if(location.getName()!="") {
+                    if (location.getName() != "") {
                         file = new File("SunInfo.txt");
-                    }
-                    else {
+                    } else {
                         file = new File("SunInfo1.txt");
                     }
                     if (file.exists()) {
@@ -2686,10 +2683,9 @@ class MainApp {
 
                 case 4: {
                     File file;
-                    if(location.getName()!="") {
+                    if (location.getName() != "") {
                         file = new File("ForecastInfo.txt");
-                    }
-                    else {
+                    } else {
                         file = new File("ForecastInfo1.txt");
                     }
                     if (file.exists()) {
@@ -2710,10 +2706,9 @@ class MainApp {
                 case 5: {
 
                     File file;
-                    if(location.getName()!="") {
+                    if (location.getName() != "") {
                         file = new File("AirPollution.txt");
-                    }
-                    else {
+                    } else {
                         file = new File("AirPollution1.txt");
                     }
                     if (file.exists()) {
@@ -2734,10 +2729,9 @@ class MainApp {
                 case 6: {
 
                     File file;
-                    if(location.getName()!="") {
+                    if (location.getName() != "") {
                         file = new File("AirPollution.txt");
-                    }
-                    else {
+                    } else {
                         file = new File("AirPollution1.txt");
                     }
                     if (file.exists()) {
