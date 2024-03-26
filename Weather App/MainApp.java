@@ -1028,27 +1028,6 @@ class TerminalUI implements UserInterface {
     }
 
     @Override
-   public class Notification {
-        private String message;
-
-        public Notification(String message) {
-            this.message = message;
-        }
-        public void printWeatherCondition(String weatherCondition) {
-            System.out.println("+---------------------------------------------------------+");
-            System.out.println("| Weather Condition: " + weatherCondition);
-            System.out.println("+---------------------------------------------------------+");
-        }
-        public void printAirQuality(String airQuality) {
-            System.out.println("+---------------------------------------------------------+");
-
-            System.out.println("| Air Quality: " + airQuality);
-            System.out.println("+---------------------------------------------------------+");
-        }
-    }
-
-
-    @Override
     public void showCurrentWeather(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         String main;
@@ -1057,52 +1036,24 @@ class TerminalUI implements UserInterface {
         int pressure;
         int humidity;
         double speed;
-        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
-        WeatherData Data = weatherService.getWeatherData(myloc);
+        WeatherData Data;
+        if (location.getName() == "") {
+            Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+            Data = weatherService.getWeatherData(myloc);
+        } else {
+            Data = weatherService.getWeatherData(location.getName());
+        }
         temp = Data.getMain().getTemp();
         pressure = Data.getMain().getPressure();
         humidity = Data.getMain().getHumidity();
         speed = Data.getWind().getSpeed();
         main = Data.getWeather().get(0).getMain();
         description = Data.getWeather().get(0).getDescription();
-
-        Notification notification = null;
-        if (description.equals("Rain")) {
-            notification = new Notification("Rainy");
-            notification.printWeatherCondition(description);
-        } else if (description.equals("Thunderstorm")) {
-            notification = new Notification("Thunderstorm");
-            notification.printWeatherCondition(description);
-        } else if (description.equals("Snow")) {
-            notification = new Notification("Snowy");
-            notification.printWeatherCondition(description);
-        } else if (description.equals("mist")) {
-            notification = new Notification("Misty");
-            notification.printWeatherCondition(description);
-        } else if (description.equals("clear sky")) {
-            notification = new Notification("Clear Sky");
-            notification.printWeatherCondition(description);
-        } else if (description.equals("few clouds")) {
-            notification = new Notification("Few Clouds");
-            notification.printWeatherCondition(description);
-        } else if (description.equals("scattered clouds")) {
-            notification = new Notification("Scattered Clouds");
-            notification.printWeatherCondition(description);
-        } else if (description.equals("broken clouds")) {
-            notification = new Notification("Broken Clouds");
-            notification.printWeatherCondition(description);
-        } else if (description.equals("shower rain")) {
-            notification = new Notification("Shower Rain");
-            notification.printWeatherCondition(description);
-        }
-        else if (description.equals("overcast clouds")) {
-            notification = new Notification("overcast clouds");
-            notification.printWeatherCondition(description);
-        }
-
-        System.out.println("Weather: " + main + "\nDescription: " + description + "\nTemperature: " + temp +
+        System.out.print("\n***************Data fetched from API****************");
+        System.out.println("\nWeather: " + main + "\nDescription: " + description + "\nTemperature: " + temp +
                 "\nPressure: " + pressure + "\nHumidity: " + humidity + "\nWind Speed: " + speed);
         storage.saveCurrentInfo(location, main, description, temp, pressure, humidity, speed);
+
     }
 
     @Override
@@ -1190,45 +1141,18 @@ class TerminalUI implements UserInterface {
     }
 
     @Override
-   
     public void showAirPollution(WeatherService weatherService, Location location, Storage storage) {
-<<<<<<< HEAD
         // Implement as required
         AirPollution MyPollutionData = new AirPollution();
 
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         MyPollutionData = weatherService.getPollutionData(myloc);
-=======
-        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
-        AirPollution myPollutionData = weatherService.getPollutionData(myloc);
-        int aqi = myPollutionData.getList().get(0).getMain().getAqi();
 
-        String airQuality;
-
-        // Determine qualitative name based on AQI
-        if (aqi == 1) {
-            airQuality = "Good";
-        } else if (aqi ==2) {
-            airQuality = "Fair";
-        } else if (aqi == 3) {
-            airQuality = "Moderate";
-        } else if (aqi == 4) {
-            airQuality = "Poor";
-        } else {
-            airQuality = "Very Poor";
-        }
->>>>>>> 6a205f3afc3127780f550eb45ae74d61c2d6c54a
-
-        System.out.println("Air Pollution Data: \n\nAir Quality Index: " + aqi);
-
-        // Print notification inside a box based on air quality
-        Notification notification = new Notification("Air Pollution Data:");
-
-        notification.printAirQuality(airQuality);
-
-        storage.saveAirPollution(location, aqi, myPollutionData.getList().get(0));
+        int aqi = MyPollutionData.getList().get(0).getMain().getAqi();
+        System.out.print("\n***************Data fetched from API****************");
+        System.out.println("\nAir pollution Data: " + "\n\nAir Quality Index: " + aqi);
+        storage.saveAirPollution(location, aqi, MyPollutionData.getList().get(0));
     }
-
 
     @Override
     public void showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
@@ -2761,7 +2685,7 @@ class MainApp {
 
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
-                    // char inputChar = scanner.next().charAt(0);
+                     char inputChar = scanner.next().charAt(0);
 
                     break;
                 }
