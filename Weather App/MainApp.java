@@ -2393,6 +2393,7 @@ class FileStorage implements Storage {
                 for (int i = 0; i < arr.length; i++) {
                     arr[i] = new Location();
                     arr[i].setName(scanner.nextLine());
+
                 }
                 scanner.close();
             } catch (FileNotFoundException e) {
@@ -2401,7 +2402,7 @@ class FileStorage implements Storage {
             int index = 0;
             for (int i = 0; i < arr.length; i++) {
 
-                if (arr[i].getName() == location.getName()) {
+                if (arr[i].getName().equalsIgnoreCase(location.getName())) {
 
                     check = true;
 
@@ -2420,6 +2421,7 @@ class FileStorage implements Storage {
                     System.err.println("Error writing to file: " + e.getMessage());
                 }
             } else {
+                System.out.println("hello");
                 return;
             }
         }
