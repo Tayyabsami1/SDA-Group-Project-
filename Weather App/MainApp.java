@@ -108,14 +108,12 @@ interface WeatherService {
     // Get Forecast for 5 next days
     Forecast getForecastData(Coord location);
 
-    // TODO Resolve Error
+    // * Resolved
     Forecast getForecastData(String country);
 
     // Air polution for certain longitude and latitide
     AirPollution getPollutionData(Coord locattion);
 
-    // TODO Resolve Error
-    AirPollution getPollutionData(String country);
 }
 
 class WeatherServiceImpl implements WeatherService {
@@ -250,27 +248,8 @@ class WeatherServiceImpl implements WeatherService {
 
     }
 
-    // TODO Error resolve
-    @Override
-    public AirPollution getPollutionData(String country) {
-
-        AirPollution myPollutionData = new AirPollution();
-
-        api = "https://api.openweathermap.org/data/2.5/air_pollution?q=" + country
-                + "&appid=109a96ae51ebbed7fa95540a48ba65b2";
-
-        String res = responseReturner(api);
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        try {
-            myPollutionData = mapper.readValue(res, AirPollution.class);
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-
-        return myPollutionData;
-    }
+    // ! Deleted the get pollution by country name function as the API endpoint
+    // doesnot exist
 
     @Override
     public AirPollution getPollutionData(Coord location) {
@@ -299,6 +278,7 @@ class WeatherServiceImpl implements WeatherService {
 // TODO : Update class diagram accordingly
 
 // * My API main class
+@JsonIgnoreProperties(ignoreUnknown = true)
 class WeatherData {
 
     public Coord coord;
@@ -421,12 +401,13 @@ class WeatherData {
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Rain{
+class Rain {
     public String h3;
 }
 
 // *Modified Forecast class to use it as my Api data store to store forecast
 // data
+@JsonIgnoreProperties(ignoreUnknown = true)
 class Forecast {
     public int cod;
     public int message;
@@ -531,6 +512,7 @@ class City {
 }
 
 // * Modified class to store Air pollution data
+@JsonIgnoreProperties(ignoreUnknown = true)
 class AirPollution {
 
     public Coord coord;
@@ -946,6 +928,7 @@ class Clouds {
     }
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 class Sys {
 
     public long sunrise;
@@ -1160,13 +1143,10 @@ class TerminalUI implements UserInterface {
     @Override
     public void showAirPollution(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
-        AirPollution MyPollutionData;
-        if (location.getName() == "") {
-            Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
-            MyPollutionData = weatherService.getPollutionData(myloc);
-        } else {
-            MyPollutionData = weatherService.getPollutionData(location.getName());
-        }
+        AirPollution MyPollutionData = new AirPollution();
+
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        MyPollutionData = weatherService.getPollutionData(myloc);
 
         int aqi = MyPollutionData.getList().get(0).getMain().getAqi();
         System.out.print("\n***************Data fetched from API****************");
@@ -1177,13 +1157,10 @@ class TerminalUI implements UserInterface {
     @Override
     public void showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
-        AirPollution MyPollutionData;
-        if (location.getName() == "") {
-            Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
-            MyPollutionData = weatherService.getPollutionData(myloc);
-        } else {
-            MyPollutionData = weatherService.getPollutionData(location.getName());
-        }
+        AirPollution MyPollutionData = new AirPollution();
+
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        MyPollutionData = weatherService.getPollutionData(myloc);
 
         AirQuality object = MyPollutionData.getList().get(0);
         int aqi = MyPollutionData.getList().get(0).getMain().getAqi();
@@ -1256,19 +1233,14 @@ class FileStorage implements Storage {
             File myFile;
             FileWriter writer;
             LocalDate today = LocalDate.now();
-            if (location.getName() != "") {
-                myFile = new File("AirPollution.txt");
-                writer = new FileWriter(myFile, true);
-                writer.write(location.getName());
-                writer.write(",");
-            } else {
-                myFile = new File("AirPollution1.txt");
-                writer = new FileWriter(myFile, true);
-                writer.write(String.valueOf(location.getLatitude()));
-                writer.write(",");
-                writer.write(String.valueOf(location.getLongitude()));
-                writer.write(",");
-            }
+
+            myFile = new File("AirPollution1.txt");
+            writer = new FileWriter(myFile, true);
+            writer.write(String.valueOf(location.getLatitude()));
+            writer.write(",");
+            writer.write(String.valueOf(location.getLongitude()));
+            writer.write(",");
+
             writer.write(String.valueOf(aqi));
             writer.write(",");
             writer.write(String.valueOf(today));
@@ -1290,6 +1262,7 @@ class FileStorage implements Storage {
             writer.write(String.valueOf(object.getComponents().getNh3()));
             writer.write("\n");
             writer.close();
+
         } catch (IOException e) {
             System.err.println("Error writing to file: " + e.getMessage());
         }
@@ -1298,107 +1271,58 @@ class FileStorage implements Storage {
 
     @Override
     public boolean checkAirPollution(Location location) {
-        String delimiter = ","; // Word to stop reading
+        String delimiter = ",";
         int numberOfLines = 0;
         LocalDate today = LocalDate.now();
-        if (location.getName() == "") {
-            boolean check = false;
-            try {
-                LineNumberReader reader = new LineNumberReader(new FileReader("AirPollution1.txt"));
-                while (reader.readLine() != null) {
-                    numberOfLines++;
-                }
-                reader.close();
-
-            } catch (IOException e) {
-                System.err.println("Error reading file: " + e.getMessage());
+        boolean check = false;
+        try {
+            LineNumberReader reader = new LineNumberReader(new FileReader("AirPollution1.txt"));
+            while (reader.readLine() != null) {
+                numberOfLines++;
             }
-            AirIndex[] arr = new AirIndex[numberOfLines];
-            Location[] arr1 = new Location[numberOfLines];
-            try {
-                Scanner scanner = new Scanner(new File("AirPollution1.txt"));
-                scanner.useDelimiter(delimiter); // Set delimiter for splitting
+            reader.close();
 
-                for (int i = 0; i < arr.length; i++) {
-                    arr[i] = new AirIndex();
-                    arr1[i] = new Location();
-                    arr1[i].setLatitude(Double.parseDouble(scanner.next()));
-                    arr1[i].setLongitude(Double.parseDouble(scanner.next()));
-                    arr[i].setaqi(Integer.parseInt(scanner.next()));
-                    arr[i].setDate(scanner.next());
-                    String firstLine = scanner.nextLine();
-
-                }
-                scanner.close();
-            } catch (FileNotFoundException e) {
-                System.err.println("Error opening file:  " + e.getMessage());
-            }
-            int index = 0;
-            for (int i = 0; i < arr.length; i++) {
-
-                if (arr1[i].getLatitude() == location.getLatitude()
-                        && arr1[i].getLongitude() == location.getLongitude()) {
-                    if (arr[i].getDate().equals(String.valueOf(today))) {
-                        check = true;
-                        index = i;
-
-                    }
-                }
-            }
-            if (check == false) {
-                return false;
-            }
-            System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println("\nAir Pollution Data: \nAir Quality Index: " + arr[index].getAqi());
-            return true;
-        } else {
-            boolean check = false;
-            try {
-                LineNumberReader reader = new LineNumberReader(new FileReader("AirPollution.txt"));
-                while (reader.readLine() != null) {
-                    numberOfLines++;
-                }
-                reader.close();
-
-            } catch (IOException e) {
-                System.err.println("Error reading file: " + e.getMessage());
-            }
-            AirIndex[] arr = new AirIndex[numberOfLines];
-            try {
-                Scanner scanner = new Scanner(new File("AirPollution.txt"));
-                scanner.useDelimiter(delimiter); // Set delimiter for splitting
-
-                for (int i = 0; i < arr.length; i++) {
-                    arr[i] = new AirIndex();
-                    arr[i].setLocation(scanner.next());
-                    arr[i].setaqi(Integer.parseInt(scanner.next()));
-                    arr[i].setDate(scanner.next());
-                    String firstLine = scanner.nextLine();
-
-                }
-                scanner.close();
-            } catch (FileNotFoundException e) {
-                System.err.println("Error opening file:  " + e.getMessage());
-            }
-            int index = 0;
-            for (int i = 0; i < arr.length; i++) {
-
-                if (arr[i].getLocation().equalsIgnoreCase(location.getName())) {
-                    if (arr[i].getDate().equals(String.valueOf(today))) {
-                        check = true;
-                        index = i;
-
-                    }
-                }
-            }
-            if (check == false) {
-                return false;
-            }
-            System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println("\nAir Pollution Data: \nAir Quality Index: " + arr[index].getAqi());
-            return true;
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
         }
+        AirIndex[] arr = new AirIndex[numberOfLines];
+        Location[] arr1 = new Location[numberOfLines];
+        try {
+            Scanner scanner = new Scanner(new File("AirPollution1.txt"));
+            scanner.useDelimiter(delimiter); // Set delimiter for splitting
 
+            for (int i = 0; i < arr.length; i++) {
+                arr[i] = new AirIndex();
+                arr1[i] = new Location();
+                arr1[i].setLatitude(Double.parseDouble(scanner.next()));
+                arr1[i].setLongitude(Double.parseDouble(scanner.next()));
+                arr[i].setaqi(Integer.parseInt(scanner.next()));
+                arr[i].setDate(scanner.next());
+                String firstLine = scanner.nextLine();
+
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("Error opening file:  " + e.getMessage());
+        }
+        int index = 0;
+        for (int i = 0; i < arr.length; i++) {
+
+            if (arr1[i].getLatitude() == location.getLatitude()
+                    && arr1[i].getLongitude() == location.getLongitude()) {
+                if (arr[i].getDate().equals(String.valueOf(today))) {
+                    check = true;
+                    index = i;
+
+                }
+            }
+        }
+        if (check == false) {
+            return false;
+        }
+        System.out.print("\n***************Data fetched from FILE****************");
+        System.out.println("\nAir Pollution Data: \nAir Quality Index: " + arr[index].getAqi());
+        return true;
     }
 
     @Override
@@ -2575,7 +2499,9 @@ class MainApp {
 
                 }
                 break;
-            } else if (option == 2) {
+            }
+
+             else if (option == 2) {
                 while (true) {
                     int obj;
                     System.out.print("\nPress 1 if you want to add new city/country name ");
@@ -2605,7 +2531,9 @@ class MainApp {
 
                 }
                 break;
-            } else {
+            }
+
+             else {
                 System.out.print("\nYou Entered an invalid choice!! ");
             }
         }
@@ -2632,11 +2560,10 @@ class MainApp {
                         if (check == false) {
                             ui.showCurrentWeather(weatherService, location, storage);
                         }
-                    }
-                     else {
+                    } else {
                         ui.showCurrentWeather(weatherService, location, storage);
                     }
-                    
+
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
                     char inputChar = scanner.next().charAt(0);
@@ -2715,10 +2642,11 @@ class MainApp {
 
                     File file;
                     if (location.getName() != "") {
-                        file = new File("AirPollution.txt");
-                    } else {
-                        file = new File("AirPollution1.txt");
+                        System.out.println("Weather API Donot exist for this");
+                        break;
                     }
+                        file = new File("AirPollution1.txt");
+                    
                     if (file.exists()) {
                         boolean check = storage.checkAirPollution(location);
                         if (check == false) {
@@ -2738,21 +2666,26 @@ class MainApp {
 
                     File file;
                     if (location.getName() != "") {
-                        file = new File("AirPollution.txt");
-                    } else {
-                        file = new File("AirPollution1.txt");
+                        System.out.println("Weather API Don't exist for this");
+                        break;
                     }
+
+                        file = new File("AirPollution1.txt");
+
                     if (file.exists()) {
                         boolean check = storage.checkPollutingGases(location);
+
                         if (check == false) {
                             ui.showPollutingGases(weatherService, location, storage);
                         }
-                    } else {
+                    }
+                     else {
                         ui.showPollutingGases(weatherService, location, storage);
                     }
+
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
-                    char inputChar = scanner.next().charAt(0);
+                    // char inputChar = scanner.next().charAt(0);
 
                     break;
                 }
