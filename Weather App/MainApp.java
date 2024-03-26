@@ -8,6 +8,7 @@ import java.util.Map;
 dependencies in your PC and included in your project structure
 the dependencies are mentioned in Readme file.*/
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -200,7 +201,7 @@ class WeatherServiceImpl implements WeatherService {
         return myweatherData;
     }
 
-    // TODO Error Resolve
+    // *Resolved :)
     @Override
     public Forecast getForecastData(String country) {
 
@@ -315,6 +316,7 @@ class WeatherData {
     public int cod;
     public int pop;
     public String dt_txt;
+    public Rain rain;
 
     public WeatherData(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
             Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
@@ -416,6 +418,11 @@ class WeatherData {
         dt_txt = s;
     }
 
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class Rain{
+    public String h3;
 }
 
 // *Modified Forecast class to use it as my Api data store to store forecast
@@ -2625,10 +2632,11 @@ class MainApp {
                         if (check == false) {
                             ui.showCurrentWeather(weatherService, location, storage);
                         }
-                    } else {
+                    }
+                     else {
                         ui.showCurrentWeather(weatherService, location, storage);
                     }
-
+                    
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
                     char inputChar = scanner.next().charAt(0);
