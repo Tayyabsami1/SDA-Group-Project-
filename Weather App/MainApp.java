@@ -1027,7 +1027,7 @@ class TerminalUI implements UserInterface {
         return scanner.nextInt();
     }
 
-    @Override
+    
    public class Notification {
         private String message;
 
