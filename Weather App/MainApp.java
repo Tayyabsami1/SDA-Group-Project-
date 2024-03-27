@@ -2632,7 +2632,7 @@ class MainApp {
 
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
-                    char inputChar = scanner.next().charAt(0);
+                    String inputChar = scanner.nextLine();
 
                     break;
                 }
@@ -2654,7 +2654,7 @@ class MainApp {
                     }
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
-                    char inputChar = scanner.next().charAt(0);
+                    String inputChar = scanner.nextLine();
 
                     break;
                 }
@@ -2677,7 +2677,7 @@ class MainApp {
                     }
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
-                    char inputChar = scanner.next().charAt(0);
+                    String inputChar = scanner.nextLine();
 
                     break;
                 }
@@ -2699,7 +2699,7 @@ class MainApp {
                     }
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
-                    char inputChar = scanner.next().charAt(0);
+                    String inputChar = scanner.nextLine();
 
                     break;
                 }
@@ -2723,7 +2723,7 @@ class MainApp {
                     }
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
-                    char inputChar = scanner.next().charAt(0);
+                    String inputChar = scanner.nextLine();
 
                     break;
                 }
@@ -2751,8 +2751,7 @@ class MainApp {
 
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
-                     char inputChar = scanner.next().charAt(0);
-
+                     String inputChar = scanner.nextLine();
                     break;
                 }
 
