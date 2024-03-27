@@ -5,6 +5,7 @@ This platform serves as our designated repository for submitting our project wor
 - Weather by Longitude and Latitude 
 - Weather by Country Name 
 - Accurate Polution Data
+- Beautiful GUI interface
 - 5 Day Forecasting 
 - Efficient File Storge
 - Cache Memory to reduce API exhausion.
@@ -17,17 +18,16 @@ Clone the project
   git clone https://link-to-project
 ```
 
-Download Object Mapper Libraries and dependencies from  [Object Mapper ](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.17.0) 
+## How to Run it 
 
-## Run Locally
+- Create a simple Java Project in Intelije Idea
+- Download Object Mapper Libraries and dependencies from  [Object Mapper ](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.17.0) 
+- Add the 4 Dependencies downloaded above and the Lib Folder from the Dependencies Folder in your Intelije Dependencies.
+- Put the Picture weth.jpg in the Main Outer folder.
+- Run the MainApp.java file.
 
-Go to the project directory
-
-```bash
-  cd my-project
-
-```
-Run the MainApp.java file.
+  ## Class Diagram Update
+  -
 
 ## Author
 
