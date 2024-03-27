@@ -2649,9 +2649,9 @@ class MainMenu extends JFrame {
         UserInterface ui = new JavaFX();
         WeatherService weatherService = new WeatherServiceImpl(
                 "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=109a96ae51ebbed7fa95540a48ba65b2"); // Replace
-                                                                                                                                               // with
-                                                                                                                                               // actual
-                                                                                                                                               // API
+        // with
+        // actual
+        // API
 
         Location loc = new Location("h", latitude, longitude);
         menu.addPropertyChangeListener(evt -> {
@@ -3449,267 +3449,273 @@ class JavaFX implements UserInterface {
 
 }
 
-// * GUI Logic ends here 
+// * GUI Logic ends here
 
 class MainApp {
 
     public static void main(String[] args) {
-        UserInterface ui = new JavaFX();
-        ui.getMenuChoice();
-        // Storage storage = new FileStorage();
-        // WeatherService weatherService = new WeatherServiceImpl(); // Replace
-        //
-        // // List<Location> locationsByLatLng = ui.getLocationsByLatLngInput();
-        // // // Get multiple locations by city/country name
-        // // List<Location> locationsByCity = ui.getLocationsByCityInput();
-        //
-        // int option;
-        // Scanner scanner1 = new Scanner(System.in);
-        // Location location = new Location();
-        //
-        // while (true) {
-        //
-        // System.out.print("\nPress 1 if you want to check weather with Latitude and
-        // longitude ");
-        // System.out.print("\nPress 2 if you want to check weather with city/country
-        // name ");
-        // System.out.print("\nEnter your choice: ");
-        //
-        // option = scanner1.nextInt();
-        //
-        // if (option == 1) {
-        //
-        // while (true) {
-        //
-        // int obj;
-        // System.out.print("\nPress 1 if you want to add new Latitude and longitude ");
-        // System.out.print("\nPress 2 if you want to use saved Latitude and longitude
-        // ");
-        // System.out.print("\nEnter your choice: ");
-        //
-        // obj = scanner1.nextInt();
-        //
-        // if (obj == 1) {
-        // location = ui.getLocationCoord();
-        // storage.saveLocationCoord(location);
-        // break;
-        // } else if (obj == 2) {
-        //
-        // File file = new File("LocationCoord.txt");
-        //
-        // if (file.exists()) {
-        // location = storage.getLocationCoord();
-        // break;
-        // }
-        //
-        // else {
-        // System.out.print("\nNo saved Longitude and Latitude!!");
-        // }
-        //
-        // } else {
-        // System.out.print("\nYou Entered an invalid choice!! ");
-        //
-        // }
-        //
-        // }
-        // break;
-        // }
-        //
-        // else if (option == 2) {
-        // while (true) {
-        // int obj;
-        // System.out.print("\nPress 1 if you want to add new city/country name ");
-        // System.out.print("\nPress 2 if you want to use saved city/country name ");
-        // System.out.print("\nEnter your choice: ");
-        //
-        // obj = scanner1.nextInt();
-        //
-        // if (obj == 1) {
-        // location = ui.getLocationName();
-        // storage.saveLocationName(location);
-        // break;
-        // } else if (obj == 2) {
-        //
-        // File file = new File("LocationName.txt");
-        //
-        // if (file.exists()) {
-        // location = storage.getLocationName();
-        // break;
-        // } else {
-        // System.out.print("\nNo saved Locations!!");
-        // }
-        // } else {
-        // System.out.print("\nYou Entered an invalid choice!! ");
-        // break;
-        // }
-        //
-        // }
-        // break;
-        // }
-        //
-        // else {
-        // System.out.print("\nYou Entered an invalid choice!! ");
-        // }
-        // }
-        //
-        // while (true) {
-        //
-        // int choice = ui.getMenuChoice();
-        //
-        // switch (choice) {
-        //
-        // case 1: {
-        //
-        // File file;
-        // if (location.getName() != "") {
-        //
-        // file = new File("CurrentInfo.txt");
-        // } else {
-        // file = new File("CurrentInfo1.txt");
-        // }
-        // if (file.exists()) {
-        //
-        // boolean check = storage.checkCurrentInfo(location);
-        //
-        // if (check == false) {
-        // ui.showCurrentWeather(weatherService, location, storage);
-        // }
-        // } else {
-        // ui.showCurrentWeather(weatherService, location, storage);
-        // }
-        //
-        // Scanner scanner = new Scanner(System.in);
-        // System.out.print("\nEnter any key to continue: ");
-        // String inputChar = scanner.nextLine();
-        //
-        // break;
-        // }
-        //
-        // case 2: {
-        // File file;
-        // if (location.getName() != "") {
-        // file = new File("BasicInfo.txt");
-        // } else {
-        // file = new File("BasicInfo1.txt");
-        // }
-        // if (file.exists()) {
-        // boolean check = storage.checkBasicInfo(location);
-        // if (check == false) {
-        // ui.showBasicInfo(weatherService, location, storage);
-        // }
-        // } else {
-        // ui.showBasicInfo(weatherService, location, storage);
-        // }
-        // Scanner scanner = new Scanner(System.in);
-        // System.out.print("\nEnter any key to continue: ");
-        // String inputChar = scanner.nextLine();
-        //
-        // break;
-        // }
-        //
-        // case 3: {
-        //
-        // File file;
-        // if (location.getName() != "") {
-        // file = new File("SunInfo.txt");
-        // } else {
-        // file = new File("SunInfo1.txt");
-        // }
-        // if (file.exists()) {
-        // boolean check = storage.checkSunInfo(location);
-        // if (check == false) {
-        // ui.showSunriseSunset(weatherService, location, storage);
-        // }
-        // } else {
-        // ui.showSunriseSunset(weatherService, location, storage);
-        // }
-        // Scanner scanner = new Scanner(System.in);
-        // System.out.print("\nEnter any key to continue: ");
-        // String inputChar = scanner.nextLine();
-        //
-        // break;
-        // }
-        //
-        // case 4: {
-        // File file;
-        // if (location.getName() != "") {
-        // file = new File("ForecastInfo.txt");
-        // } else {
-        // file = new File("ForecastInfo1.txt");
-        // }
-        // if (file.exists()) {
-        // boolean check = storage.checkForecastInfo(location);
-        // if (check == false) {
-        // ui.showWeatherForecast(weatherService, location, storage);
-        // }
-        // } else {
-        // ui.showWeatherForecast(weatherService, location, storage);
-        // }
-        // Scanner scanner = new Scanner(System.in);
-        // System.out.print("\nEnter any key to continue: ");
-        // String inputChar = scanner.nextLine();
-        //
-        // break;
-        // }
-        //
-        // case 5: {
-        //
-        // File file;
-        // if (location.getName() != "") {
-        // System.out.println("Weather API Donot exist for this");
-        // break;
-        // }
-        // file = new File("AirPollution1.txt");
-        //
-        // if (file.exists()) {
-        // boolean check = storage.checkAirPollution(location);
-        // if (check == false) {
-        // ui.showAirPollution(weatherService, location, storage);
-        // }
-        // } else {
-        // ui.showAirPollution(weatherService, location, storage);
-        // }
-        // Scanner scanner = new Scanner(System.in);
-        // System.out.print("\nEnter any key to continue: ");
-        // String inputChar = scanner.nextLine();
-        //
-        // break;
-        // }
-        //
-        // case 6: {
-        //
-        // File file;
-        // if (location.getName() != "") {
-        // System.out.println("Weather API Don't exist for this");
-        // break;
-        // }
-        //
-        // file = new File("AirPollution1.txt");
-        //
-        // if (file.exists()) {
-        // boolean check = storage.checkPollutingGases(location);
-        //
-        // if (check == false) {
-        // ui.showPollutingGases(weatherService, location, storage);
-        // }
-        // }
-        // else {
-        // ui.showPollutingGases(weatherService, location, storage);
-        // }
-        //
-        // Scanner scanner = new Scanner(System.in);
-        // System.out.print("\nEnter any key to continue: ");
-        // String inputChar = scanner.nextLine();
-        // break;
-        // }
-        //
-        // case 7:
-        // System.out.println("Exiting weather app.");
-        // return;
-        //
-        // default:
-        // System.out.println("Invalid choice.");
-        // }
-        // }
+
+        Scanner scanner1 = new Scanner(System.in);
+        System.out.println("Run project in (1) Terminal or (2) GUI?");
+        int mychoice = scanner1.nextInt();
+
+        // ? GUI Logic
+        if (mychoice == 2) {
+            UserInterface ui = new JavaFX();
+            ui.getMenuChoice();
+        }
+
+        // Terminal Logic
+
+        else {
+            UserInterface ui = new TerminalUI();
+            Storage storage = new FileStorage();
+            WeatherService weatherService = new WeatherServiceImpl();
+
+            int option;
+            Location location = new Location();
+
+            while (true) {
+
+                System.out.print("\nPress 1 if you want to check weather with Latitude and longitude ");
+                System.out.print("\nPress 2 if you want to check weather with city/country name ");
+                System.out.print("\nEnter your choice: ");
+
+                option = scanner1.nextInt();
+
+                if (option == 1) {
+
+                    while (true) {
+
+                        int obj;
+                        System.out.print("\nPress 1 if you want to add new Latitude and longitude ");
+                        System.out.print("\nPress 2 if you want to use saved Latitude and longitude ");
+                        System.out.print("\nEnter your choice: ");
+
+                        obj = scanner1.nextInt();
+
+                        if (obj == 1) {
+                            location = ui.getLocationCoord();
+                            storage.saveLocationCoord(location);
+                            break;
+                        } else if (obj == 2) {
+
+                            File file = new File("LocationCoord.txt");
+
+                            if (file.exists()) {
+                                location = storage.getLocationCoord();
+                                break;
+                            }
+
+                            else {
+                                System.out.print("\nNo saved Longitude and Latitude!!");
+                            }
+
+                        } else {
+                            System.out.print("\nYou Entered an invalid choice!! ");
+
+                        }
+
+                    }
+                    break;
+                }
+
+                else if (option == 2) {
+                    while (true) {
+                        int obj;
+                        System.out.print("\nPress 1 if you want to add new city/country name ");
+                        System.out.print("\nPress 2 if you want to use saved city/country name ");
+                        System.out.print("\nEnter your choice: ");
+
+                        obj = scanner1.nextInt();
+
+                        if (obj == 1) {
+                            location = ui.getLocationName();
+                            storage.saveLocationName(location);
+                            break;
+                        } else if (obj == 2) {
+
+                            File file = new File("LocationName.txt");
+
+                            if (file.exists()) {
+                                location = storage.getLocationName();
+                                break;
+                            } else {
+                                System.out.print("\nNo saved Locations!!");
+                            }
+                        } else {
+                            System.out.print("\nYou Entered an invalid choice!! ");
+                            break;
+                        }
+
+                    }
+                    break;
+                }
+
+                else {
+                    System.out.print("\nYou Entered an invalid choice!! ");
+                }
+            }
+
+            while (true) {
+
+                int choice = ui.getMenuChoice();
+
+                switch (choice) {
+
+                    case 1: {
+
+                        File file;
+                        if (location.getName() != "") {
+
+                            file = new File("CurrentInfo.txt");
+                        } else {
+                            file = new File("CurrentInfo1.txt");
+                        }
+                        if (file.exists()) {
+
+                            boolean check = storage.checkCurrentInfo(location);
+
+                            if (check == false) {
+                                ui.showCurrentWeather(weatherService, location, storage);
+                            }
+                        } else {
+                            ui.showCurrentWeather(weatherService, location, storage);
+                        }
+
+                        Scanner scanner = new Scanner(System.in);
+                        System.out.print("\nEnter any key to continue: ");
+                        String inputChar = scanner.nextLine();
+
+                        break;
+                    }
+
+                    case 2: {
+                        File file;
+                        if (location.getName() != "") {
+                            file = new File("BasicInfo.txt");
+                        } else {
+                            file = new File("BasicInfo1.txt");
+                        }
+                        if (file.exists()) {
+                            boolean check = storage.checkBasicInfo(location);
+                            if (check == false) {
+                                ui.showBasicInfo(weatherService, location, storage);
+                            }
+                        } else {
+                            ui.showBasicInfo(weatherService, location, storage);
+                        }
+                        Scanner scanner = new Scanner(System.in);
+                        System.out.print("\nEnter any key to continue: ");
+                        String inputChar = scanner.nextLine();
+
+                        break;
+                    }
+
+                    case 3: {
+
+                        File file;
+                        if (location.getName() != "") {
+                            file = new File("SunInfo.txt");
+                        } else {
+                            file = new File("SunInfo1.txt");
+                        }
+                        if (file.exists()) {
+                            boolean check = storage.checkSunInfo(location);
+                            if (check == false) {
+                                ui.showSunriseSunset(weatherService, location, storage);
+                            }
+                        } else {
+                            ui.showSunriseSunset(weatherService, location, storage);
+                        }
+                        Scanner scanner = new Scanner(System.in);
+                        System.out.print("\nEnter any key to continue: ");
+                        String inputChar = scanner.nextLine();
+
+                        break;
+                    }
+
+                    case 4: {
+                        File file;
+                        if (location.getName() != "") {
+                            file = new File("ForecastInfo.txt");
+                        } else {
+                            file = new File("ForecastInfo1.txt");
+                        }
+                        if (file.exists()) {
+                            boolean check = storage.checkForecastInfo(location);
+                            if (check == false) {
+                                ui.showWeatherForecast(weatherService, location, storage);
+                            }
+                        } else {
+                            ui.showWeatherForecast(weatherService, location, storage);
+                        }
+                        Scanner scanner = new Scanner(System.in);
+                        System.out.print("\nEnter any key to continue: ");
+                        String inputChar = scanner.nextLine();
+
+                        break;
+                    }
+
+                    case 5: {
+
+                        File file;
+                        if (location.getName() != "") {
+                            System.out.println("Weather API Donot exist for this");
+                            break;
+                        }
+                        file = new File("AirPollution1.txt");
+
+                        if (file.exists()) {
+                            boolean check = storage.checkAirPollution(location);
+                            if (check == false) {
+                                ui.showAirPollution(weatherService, location, storage);
+                            }
+                        } else {
+                            ui.showAirPollution(weatherService, location, storage);
+                        }
+                        Scanner scanner = new Scanner(System.in);
+                        System.out.print("\nEnter any key to continue: ");
+                        String inputChar = scanner.nextLine();
+
+                        break;
+                    }
+
+                    case 6: {
+
+                        File file;
+                        if (location.getName() != "") {
+                            System.out.println("Weather API Don't exist for this");
+                            break;
+                        }
+
+                        file = new File("AirPollution1.txt");
+
+                        if (file.exists()) {
+                            boolean check = storage.checkPollutingGases(location);
+
+                            if (check == false) {
+                                ui.showPollutingGases(weatherService, location, storage);
+                            }
+                        } else {
+                            ui.showPollutingGases(weatherService, location, storage);
+                        }
+
+                        Scanner scanner = new Scanner(System.in);
+                        System.out.print("\nEnter any key to continue: ");
+                        String inputChar = scanner.nextLine();
+                        break;
+                    }
+
+                    case 7:
+                        System.out.println("Exiting weather app.");
+                        return;
+
+                    default:
+                        System.out.println("Invalid choice.");
+                }
+            }
+        }
+
     }
 }
