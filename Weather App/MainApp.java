@@ -51,7 +51,7 @@ interface UserInterface {
 
     List<String> showCurrentWeather(WeatherService weatherService, Location location, Storage storage);
 
-   List<String> showBasicInfo(WeatherService weatherService, Location location, Storage storage);
+    List<String> showBasicInfo(WeatherService weatherService, Location location, Storage storage);
 
     List<String> showSunriseSunset(WeatherService weatherService, Location location, Storage storage);
 
@@ -82,7 +82,7 @@ interface Storage {
     boolean checkSunInfo(Location location);
 
     void saveCurrentInfo(Location location, String main, String description, double temp, int pressure, int humidity,
-                         double speed);
+            double speed);
 
     boolean checkCurrentInfo(Location location);
 
@@ -304,7 +304,7 @@ class WeatherData {
     public Rain rain;
 
     public WeatherData(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
-                       Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
+            Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
         this.coord = coord;
         this.weather = weather;
         this.base = base;
@@ -454,7 +454,7 @@ class City {
     public long sunset;
 
     public City(int id, String name, Coord coord, String country, int population, int timezone, long sunrise,
-                long sunset) {
+            long sunset) {
         this.id = id;
         this.name = name;
         this.coord = coord;
@@ -805,7 +805,7 @@ class Main {
     }
 
     public Main(double temp, double feels_like, double temp_min, double temp_max, int pressure, int humidity,
-                int sea_level, int grnd_level, int temp_kf) {
+            int sea_level, int grnd_level, int temp_kf) {
         this.temp = temp;
         this.feels_like = feels_like;
         this.temp_min = temp_min;
@@ -1032,18 +1032,19 @@ class TerminalUI implements UserInterface {
         return scanner.nextInt();
     }
 
-
     public class Notification {
         private String message;
 
         public Notification(String message) {
             this.message = message;
         }
+
         public void printWeatherCondition(String weatherCondition) {
             System.out.println("+---------------------------------------------------------+");
             System.out.println("| Weather Condition: " + weatherCondition);
             System.out.println("+---------------------------------------------------------+");
         }
+
         public void printAirQuality(String airQuality) {
             System.out.println("+---------------------------------------------------------+");
 
@@ -1052,9 +1053,8 @@ class TerminalUI implements UserInterface {
         }
     }
 
-
     @Override
-    public   List<String> showCurrentWeather(WeatherService weatherService, Location location, Storage storage) {
+    public List<String> showCurrentWeather(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         String main;
         String description;
@@ -1099,8 +1099,7 @@ class TerminalUI implements UserInterface {
         } else if (description.equals("shower rain")) {
             notification = new Notification("Shower Rain");
             notification.printWeatherCondition(description);
-        }
-        else if (description.equals("overcast clouds")) {
+        } else if (description.equals("overcast clouds")) {
             notification = new Notification("overcast clouds");
             notification.printWeatherCondition(description);
         }
@@ -1112,7 +1111,7 @@ class TerminalUI implements UserInterface {
     }
 
     @Override
-    public   List<String> showBasicInfo(WeatherService weatherService, Location location, Storage storage) {
+    public List<String> showBasicInfo(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         double feels_like;
         double temp_min;
@@ -1135,7 +1134,7 @@ class TerminalUI implements UserInterface {
     }
 
     @Override
-    public   List<String>showSunriseSunset(WeatherService weatherService, Location location, Storage storage) {
+    public List<String> showSunriseSunset(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         long sun_rise;
         long sun_set;
@@ -1195,7 +1194,7 @@ class TerminalUI implements UserInterface {
                     "\n\tTime of Data Forecasted: " + weather.getDtText() + "\n");
         }
         storage.saveForecastInfo(location, ForecastData);
-        Object[][]temp=null;
+        Object[][] temp = null;
         return temp;
     }
 
@@ -1211,7 +1210,7 @@ class TerminalUI implements UserInterface {
         // Determine qualitative name based on AQI
         if (aqi == 1) {
             airQuality = "Good";
-        } else if (aqi ==2) {
+        } else if (aqi == 2) {
             airQuality = "Fair";
         } else if (aqi == 3) {
             airQuality = "Moderate";
@@ -1231,8 +1230,9 @@ class TerminalUI implements UserInterface {
         storage.saveAirPollution(location, aqi, myPollutionData.getList().get(0));
         return 0;
     }
+
     @Override
-    public  List<Double>showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
+    public List<Double> showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         AirPollution MyPollutionData = new AirPollution();
 
@@ -2079,7 +2079,7 @@ class FileStorage implements Storage {
 
     @Override
     public void saveCurrentInfo(Location location, String main, String description, double temp, int pressure,
-                                int humidity, double speed) {
+            int humidity, double speed) {
         try {
 
             File myFile;
@@ -2517,8 +2517,7 @@ class Notification {
     }
 }
 
-// Changing the Name of the start point
-// ! Also changed the name of the file so that it runs
+// * GUI Logic Sterts here
 class InputGUI extends JFrame {
     private JTextField locationField;
     private JTextField longitudeField;
@@ -2583,7 +2582,6 @@ class InputGUI extends JFrame {
         add(panel);
     }
 }
-
 
 class MainMenu extends JFrame {
     private static final int IMAGE_WIDTH = 720;
@@ -2650,9 +2648,12 @@ class MainMenu extends JFrame {
         Storage storage = new FileStorage();
         UserInterface ui = new JavaFX();
         WeatherService weatherService = new WeatherServiceImpl(
-                "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=109a96ae51ebbed7fa95540a48ba65b2"); // Replace with actual API
+                "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=109a96ae51ebbed7fa95540a48ba65b2"); // Replace
+                                                                                                                                               // with
+                                                                                                                                               // actual
+                                                                                                                                               // API
 
-        Location loc=new Location("h",latitude,longitude);
+        Location loc = new Location("h", latitude, longitude);
         menu.addPropertyChangeListener(evt -> {
             if ("ShowCurrentWeatherButtonClicked".equals(evt.getPropertyName())) {
                 showWeather.setVisible(true);
@@ -2661,9 +2662,10 @@ class MainMenu extends JFrame {
                 showPollutingGases.setVisible(false);
                 showAirData.setVisible(false);
                 showFiveForecast.setVisible(false);
-                List<String> i=new ArrayList<>();
-                i=  ui.showCurrentWeather(weatherService,loc,storage);
-                showWeather.updateWeatherInfo(i.get(0),i.get(1),Double.parseDouble(i.get(2)),Integer.parseInt(i.get(3)),Integer.parseInt(i.get(4)),Double.parseDouble(i.get(5)));
+                List<String> i = new ArrayList<>();
+                i = ui.showCurrentWeather(weatherService, loc, storage);
+                showWeather.updateWeatherInfo(i.get(0), i.get(1), Double.parseDouble(i.get(2)),
+                        Integer.parseInt(i.get(3)), Integer.parseInt(i.get(4)), Double.parseDouble(i.get(5)));
                 showWeather.setVisible(true);
             } else if ("ShowBasicInfoButtonClicked".equals(evt.getPropertyName())) {
                 basicInfo.setVisible(true);
@@ -2672,9 +2674,10 @@ class MainMenu extends JFrame {
                 showPollutingGases.setVisible(false);
                 showAirData.setVisible(false);
                 showFiveForecast.setVisible(false);
-                List<String>i=new ArrayList<>();
-                i=  ui.showBasicInfo(weatherService,loc,storage);
-                basicInfo.updateWeatherInfo(Double.parseDouble(i.get(0)),Double.parseDouble(i.get(1)),Double.parseDouble(i.get(2)));
+                List<String> i = new ArrayList<>();
+                i = ui.showBasicInfo(weatherService, loc, storage);
+                basicInfo.updateWeatherInfo(Double.parseDouble(i.get(0)), Double.parseDouble(i.get(1)),
+                        Double.parseDouble(i.get(2)));
                 basicInfo.setVisible(true);
             } else if ("ShowSunTimeButtonClicked".equals(evt.getPropertyName())) {
                 showSunTime.setVisible(true);
@@ -2683,9 +2686,9 @@ class MainMenu extends JFrame {
                 showPollutingGases.setVisible(false);
                 showAirData.setVisible(false);
                 showFiveForecast.setVisible(false);
-                List<String>i=new ArrayList<>();
-                i=  ui.showSunriseSunset(weatherService,loc,storage);
-                showSunTime.update_suntime(i.get(0),i.get(1));
+                List<String> i = new ArrayList<>();
+                i = ui.showSunriseSunset(weatherService, loc, storage);
+                showSunTime.update_suntime(i.get(0), i.get(1));
                 showSunTime.setVisible(true);
             } else if ("ShowPollutingGasesButtonClicked".equals(evt.getPropertyName())) {
                 showSunTime.setVisible(false);
@@ -2694,8 +2697,8 @@ class MainMenu extends JFrame {
                 showPollutingGases.setVisible(true);
                 showAirData.setVisible(false);
                 showFiveForecast.setVisible(false);
-                List<Double>i=new ArrayList<>();
-                i=  ui.showPollutingGases(weatherService,loc,storage);
+                List<Double> i = new ArrayList<>();
+                i = ui.showPollutingGases(weatherService, loc, storage);
                 showPollutingGases.updatePollutingGasesInfo(i);
                 showPollutingGases.setVisible(true);
             } else if ("ShowAirDataButtonClicked".equals(evt.getPropertyName())) {
@@ -2706,7 +2709,7 @@ class MainMenu extends JFrame {
                 showAirData.setVisible(true);
                 showFiveForecast.setVisible(false);
                 int i;
-                i=  ui.showAirPollution(weatherService,loc,storage);
+                i = ui.showAirPollution(weatherService, loc, storage);
                 showAirData.updateaqi(i);
                 showAirData.setVisible(true);
             } else if ("ShowWeatherForecastButtonClicked".equals(evt.getPropertyName())) {
@@ -2717,12 +2720,11 @@ class MainMenu extends JFrame {
                 showPollutingGases.setVisible(false);
                 showAirData.setVisible(false);
                 showFiveForecast.setVisible(true);
-                Object[][]fore;
-                fore=  ui.showWeatherForecast(weatherService,loc,storage);
+                Object[][] fore;
+                fore = ui.showWeatherForecast(weatherService, loc, storage);
                 showFiveForecast.updateForecastData(fore);
                 showFiveForecast.setVisible(true);
-            }
-            else if ("ShowExit".equals(evt.getPropertyName())){
+            } else if ("ShowExit".equals(evt.getPropertyName())) {
                 JOptionPane.showMessageDialog(null, "Thank you for using the application! Goodbye!");
                 // Exit the application
                 System.exit(0);
@@ -2734,9 +2736,7 @@ class MainMenu extends JFrame {
         setVisible(true);
     }
 
-
 }
-
 
 class Menu extends JPanel {
     Menu() {
@@ -2791,8 +2791,6 @@ class Menu extends JPanel {
     }
 }
 
-
-
 class ShowWeather extends JPanel {
     private JLabel weatherLabel;
     private JLabel descriptionLabel;
@@ -2805,7 +2803,6 @@ class ShowWeather extends JPanel {
         setLayout(new GridBagLayout());
 
         // Set background image
-
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -2865,7 +2862,8 @@ class ShowWeather extends JPanel {
     }
 
     // Method to update current weather information
-    public void updateWeatherInfo(String weather, String description, double temperature, double pressure, double humidity, double windSpeed) {
+    public void updateWeatherInfo(String weather, String description, double temperature, double pressure,
+            double humidity, double windSpeed) {
         weatherLabel.setText("Current Weather: " + weather);
         descriptionLabel.setText("Weather Description: " + description);
         temperatureLabel.setText("Temperature: " + temperature + "°C");
@@ -2873,6 +2871,7 @@ class ShowWeather extends JPanel {
         humidityLabel.setText("Humidity: " + humidity + "%");
         windSpeedLabel.setText("Wind Speed: " + windSpeed + " m/s");
     }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -2880,7 +2879,6 @@ class ShowWeather extends JPanel {
         g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
     }
 }
-
 
 class BasicInfo extends JPanel {
     private JLabel feelsLikeLabel;
@@ -2944,7 +2942,6 @@ class BasicInfo extends JPanel {
         g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
     }
 }
-
 
 class ShowSunTime extends JPanel {
     private JLabel mainHeading;
@@ -3013,7 +3010,8 @@ class ShowSunTime extends JPanel {
         // Set background image
 
     }
-    public void update_suntime(String r,String s){
+
+    public void update_suntime(String r, String s) {
 
         sunriseTimeLabel.setText(r);
         sunsetTimeLabel.setText(s);
@@ -3025,7 +3023,6 @@ class ShowSunTime extends JPanel {
         g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
     }
 }
-
 
 class ShowPollutingGases extends JPanel {
     private JLabel pollutingGasesLabel;
@@ -3153,7 +3150,8 @@ class ShowPollutingGases extends JPanel {
 }
 
 class ShowAirData extends JPanel {
-    private  JLabel airQualityIndexValueLabel;
+    private JLabel airQualityIndexValueLabel;
+
     ShowAirData(Menu menu) {
         setLayout(new GridBagLayout());
 
@@ -3199,15 +3197,16 @@ class ShowAirData extends JPanel {
         // Set background image
 
     }
-    public void updateaqi(int a){
+
+    public void updateaqi(int a) {
         airQualityIndexValueLabel.setText(Integer.toString(a));
     }
+
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         ImageIcon backgroundImage = new ImageIcon("weth.jpg"); // Adjust image path
         g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
     }
-
 
 }
 
@@ -3218,7 +3217,9 @@ class ShowFiveForecast extends JPanel {
         setLayout(new BorderLayout());
 
         // Create a table with 5 rows (one for each day) and appropriate columns
-        DefaultTableModel model = new DefaultTableModel(new Object[5][11], new String[]{"Day", "Weather", "Description", "Temperature", "Pressure", "Humidity", "Feels Like", "Min Temp", "Max Temp", "Wind Speed", "Time of Forecast"});
+        DefaultTableModel model = new DefaultTableModel(new Object[5][11],
+                new String[] { "Day", "Weather", "Description", "Temperature", "Pressure", "Humidity", "Feels Like",
+                        "Min Temp", "Max Temp", "Wind Speed", "Time of Forecast" });
         table = new JTable(model) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -3231,14 +3232,14 @@ class ShowFiveForecast extends JPanel {
         table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16)); // Set header font
 
         // Set preferred column widths
-        int[] columnWidths = {50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50}; // Adjust as needed
+        int[] columnWidths = { 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50 }; // Adjust as needed
         for (int i = 0; i < columnWidths.length; i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
         }
 
         // Set row height
-        for (int i=1;i<=31;i++) {
-            table.setRowHeight(i,15);
+        for (int i = 1; i <= 31; i++) {
+            table.setRowHeight(i, 15);
         }
         // Adjust row height as needed
 
@@ -3277,29 +3278,37 @@ class ShowFiveForecast extends JPanel {
     }
 }
 
+class JavaFX implements UserInterface {
+    public void displayLocationOptions(List<Location> locations) {
+    }
 
+    public Location getLocationInput() {
+        return new Location("h", 1, 1);
+    }
 
-
-
-
-
-class JavaFX implements UserInterface{
-    public void displayLocationOptions(List<Location> locations){}
-
-    public  Location getLocationInput(){  return new Location("h",1,1);}
-
-    public int getMenuChoice(){   InputGUI inputGUI = new InputGUI();
+    public int getMenuChoice() {
+        InputGUI inputGUI = new InputGUI();
         inputGUI.setVisible(true);
-        return 0;}
+        return 0;
+    }
 
+    List<Location> getLocationsByLatLngInput() {
+        return new ArrayList<>();
+    }
 
-     List<Location> getLocationsByLatLngInput(){return new ArrayList<>();}
+    List<Location> getLocationsByCityInput() {
+        return new ArrayList<>();
+    }
 
-     List<Location> getLocationsByCityInput(){return new ArrayList<>();}
-    public Location getLocationName() {return new Location();}
-    public Location getLocationCoord(){return new Location();}
+    public Location getLocationName() {
+        return new Location();
+    }
 
-    public List<String> showCurrentWeather(WeatherService weatherService,Location location,Storage storage ){
+    public Location getLocationCoord() {
+        return new Location();
+    }
+
+    public List<String> showCurrentWeather(WeatherService weatherService, Location location, Storage storage) {
         String main;
         String description;
         double temp;
@@ -3308,13 +3317,13 @@ class JavaFX implements UserInterface{
         double speed;
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         WeatherData Data = weatherService.getWeatherData(myloc);
-        temp=Data.getMain().getTemp();
-        pressure=Data.getMain().getPressure();
-        humidity=Data.getMain().getHumidity();
-        speed=Data.getWind().getSpeed();
-        main =Data.getWeather().get(0).getMain();
-        description=Data.getWeather().get(0).getDescription();
-        List<String>i=new ArrayList<>();
+        temp = Data.getMain().getTemp();
+        pressure = Data.getMain().getPressure();
+        humidity = Data.getMain().getHumidity();
+        speed = Data.getWind().getSpeed();
+        main = Data.getWeather().get(0).getMain();
+        description = Data.getWeather().get(0).getDescription();
+        List<String> i = new ArrayList<>();
         i.add(main);
         i.add(description);
         i.add(Double.toString(temp));
@@ -3322,20 +3331,20 @@ class JavaFX implements UserInterface{
         i.add(Integer.toString(humidity));
         i.add(Double.toString(speed));
 
-        storage.saveCurrentInfo(location, main, description, temp,pressure,humidity,speed);
+        storage.saveCurrentInfo(location, main, description, temp, pressure, humidity, speed);
         return i;
     }
 
-    public  List<String> showBasicInfo(WeatherService weatherService, Location location,Storage storage){
+    public List<String> showBasicInfo(WeatherService weatherService, Location location, Storage storage) {
         double feels_like;
         double temp_min;
         double temp_max;
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         WeatherData Data = weatherService.getWeatherData(myloc);
-        feels_like=Data.getMain().getFeelsLike();
-        temp_min=Data.getMain().getTempMin();
-        temp_max=Data.getMain().getTempMax();
-        List<String>i=new ArrayList<>();
+        feels_like = Data.getMain().getFeelsLike();
+        temp_min = Data.getMain().getTempMin();
+        temp_max = Data.getMain().getTempMax();
+        List<String> i = new ArrayList<>();
 
         i.add(Double.toString(feels_like));
         i.add(Double.toString(temp_min));
@@ -3344,14 +3353,14 @@ class JavaFX implements UserInterface{
         return i;
     }
 
-    public  List<String> showSunriseSunset(WeatherService weatherService,Location location,Storage storage){
+    public List<String> showSunriseSunset(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
-        long  sun_rise;
-        long  sun_set;
+        long sun_rise;
+        long sun_set;
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         WeatherData Data = weatherService.getWeatherData(myloc);
-        sun_rise=Data.getSys().getSunrise();
-        sun_set=Data.getSys().getSunset();
+        sun_rise = Data.getSys().getSunrise();
+        sun_set = Data.getSys().getSunset();
 
         // Convert timestamp to Date object (assuming seconds)
         Date date1 = new Date(sun_rise * 1000); // Multiply by 1000 if milliseconds
@@ -3360,7 +3369,7 @@ class JavaFX implements UserInterface{
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss"); // Use "HH" for 24-hour format
         String SunR = formatter.format(date1);
         String SunS = formatter.format(date2);
-        List<String>i=new ArrayList<>();
+        List<String> i = new ArrayList<>();
         i.add(SunR);
         i.add(SunS);
 
@@ -3368,12 +3377,12 @@ class JavaFX implements UserInterface{
         return i;
     }
 
-    public  Object[][] showWeatherForecast(WeatherService weatherService, Location location,Storage storage){
+    public Object[][] showWeatherForecast(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
 
         Forecast ForecastData = weatherService.getForecastData(myloc);
-        List<WeatherData> list=ForecastData.getList();
+        List<WeatherData> list = ForecastData.getList();
         // ! This returns a list of 40 weather forecase for the next 5 days each list
         // contains forecast of 3hrs
         System.out.println("Weather Forecast for 5 days : ");
@@ -3397,34 +3406,34 @@ class JavaFX implements UserInterface{
 
             i++;
         }
-        storage.saveForecastInfo(location,ForecastData);
+        storage.saveForecastInfo(location, ForecastData);
         return forecastData;
     }
 
-    public  int showAirPollution(WeatherService weatherService,Location location,Storage storage){
+    public int showAirPollution(WeatherService weatherService, Location location, Storage storage) {
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
-        AirPollution MyPollutionData=weatherService.getPollutionData(myloc);
-        int aqi=MyPollutionData.getList().get(0).getMain().getAqi();
-        storage.saveAirPollution(location,aqi,MyPollutionData.getList().get(0));
+        AirPollution MyPollutionData = weatherService.getPollutionData(myloc);
+        int aqi = MyPollutionData.getList().get(0).getMain().getAqi();
+        storage.saveAirPollution(location, aqi, MyPollutionData.getList().get(0));
         return aqi;
     }
 
-    public  List<Double> showPollutingGases(WeatherService weatherService,Location location,Storage storage){
+    public List<Double> showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
-        AirPollution MyPollutionData=weatherService.getPollutionData(myloc);
-        AirQuality object=MyPollutionData.getList().get(0);
-        int aqi=MyPollutionData.getList().get(0).getMain().getAqi();
-        double co=object.getComponents().getCo();
-        double no=object.getComponents().getNo();
-        double no2=object.getComponents().getNo2();
-        double o3=object.getComponents().getO3();
-        double so2=object.getComponents().getSo2();
-        double pm2=object.getComponents().getPm2_5();
-        double pm10=object.getComponents().getPm10();
-        double nh3=object.getComponents().getNh3();
+        AirPollution MyPollutionData = weatherService.getPollutionData(myloc);
+        AirQuality object = MyPollutionData.getList().get(0);
+        int aqi = MyPollutionData.getList().get(0).getMain().getAqi();
+        double co = object.getComponents().getCo();
+        double no = object.getComponents().getNo();
+        double no2 = object.getComponents().getNo2();
+        double o3 = object.getComponents().getO3();
+        double so2 = object.getComponents().getSo2();
+        double pm2 = object.getComponents().getPm2_5();
+        double pm10 = object.getComponents().getPm10();
+        double nh3 = object.getComponents().getNh3();
 
-        List<Double>i=new ArrayList<>();
-        i.add((double)(aqi));
+        List<Double> i = new ArrayList<>();
+        i.add((double) (aqi));
         i.add(co);
         i.add(no);
         i.add(no2);
@@ -3434,267 +3443,273 @@ class JavaFX implements UserInterface{
         i.add(pm10);
         i.add(nh3);
 
-        storage.saveAirPollution(location,aqi,MyPollutionData.getList().get(0));
+        storage.saveAirPollution(location, aqi, MyPollutionData.getList().get(0));
         return i;
     }
 
 }
+
+// * GUI Logic ends here 
+
 class MainApp {
 
     public static void main(String[] args) {
         UserInterface ui = new JavaFX();
         ui.getMenuChoice();
-//        Storage storage = new FileStorage();
-//        WeatherService weatherService = new WeatherServiceImpl(); // Replace
-//
-//        // List<Location> locationsByLatLng = ui.getLocationsByLatLngInput();
-//        // // Get multiple locations by city/country name
-//        // List<Location> locationsByCity = ui.getLocationsByCityInput();
-//
-//        int option;
-//        Scanner scanner1 = new Scanner(System.in);
-//        Location location = new Location();
-//
-//        while (true) {
-//
-//            System.out.print("\nPress 1 if you want to check weather with Latitude and longitude ");
-//            System.out.print("\nPress 2 if you want to check weather with city/country name ");
-//            System.out.print("\nEnter your choice: ");
-//
-//            option = scanner1.nextInt();
-//
-//            if (option == 1) {
-//
-//                while (true) {
-//
-//                    int obj;
-//                    System.out.print("\nPress 1 if you want to add new Latitude and longitude ");
-//                    System.out.print("\nPress 2 if you want to use saved Latitude and longitude ");
-//                    System.out.print("\nEnter your choice: ");
-//
-//                    obj = scanner1.nextInt();
-//
-//                    if (obj == 1) {
-//                        location = ui.getLocationCoord();
-//                        storage.saveLocationCoord(location);
-//                        break;
-//                    } else if (obj == 2) {
-//
-//                        File file = new File("LocationCoord.txt");
-//
-//                        if (file.exists()) {
-//                            location = storage.getLocationCoord();
-//                            break;
-//                        }
-//
-//                        else {
-//                            System.out.print("\nNo saved Longitude and Latitude!!");
-//                        }
-//
-//                    } else {
-//                        System.out.print("\nYou Entered an invalid choice!! ");
-//
-//                    }
-//
-//                }
-//                break;
-//            }
-//
-//            else if (option == 2) {
-//                while (true) {
-//                    int obj;
-//                    System.out.print("\nPress 1 if you want to add new city/country name ");
-//                    System.out.print("\nPress 2 if you want to use saved city/country name ");
-//                    System.out.print("\nEnter your choice: ");
-//
-//                    obj = scanner1.nextInt();
-//
-//                    if (obj == 1) {
-//                        location = ui.getLocationName();
-//                        storage.saveLocationName(location);
-//                        break;
-//                    } else if (obj == 2) {
-//
-//                        File file = new File("LocationName.txt");
-//
-//                        if (file.exists()) {
-//                            location = storage.getLocationName();
-//                            break;
-//                        } else {
-//                            System.out.print("\nNo saved Locations!!");
-//                        }
-//                    } else {
-//                        System.out.print("\nYou Entered an invalid choice!! ");
-//                        break;
-//                    }
-//
-//                }
-//                break;
-//            }
-//
-//            else {
-//                System.out.print("\nYou Entered an invalid choice!! ");
-//            }
-//        }
-//
-//        while (true) {
-//
-//            int choice = ui.getMenuChoice();
-//
-//            switch (choice) {
-//
-//                case 1: {
-//
-//                    File file;
-//                    if (location.getName() != "") {
-//
-//                        file = new File("CurrentInfo.txt");
-//                    } else {
-//                        file = new File("CurrentInfo1.txt");
-//                    }
-//                    if (file.exists()) {
-//
-//                        boolean check = storage.checkCurrentInfo(location);
-//
-//                        if (check == false) {
-//                            ui.showCurrentWeather(weatherService, location, storage);
-//                        }
-//                    } else {
-//                        ui.showCurrentWeather(weatherService, location, storage);
-//                    }
-//
-//                    Scanner scanner = new Scanner(System.in);
-//                    System.out.print("\nEnter any key to continue: ");
-//                    String inputChar = scanner.nextLine();
-//
-//                    break;
-//                }
-//
-//                case 2: {
-//                    File file;
-//                    if (location.getName() != "") {
-//                        file = new File("BasicInfo.txt");
-//                    } else {
-//                        file = new File("BasicInfo1.txt");
-//                    }
-//                    if (file.exists()) {
-//                        boolean check = storage.checkBasicInfo(location);
-//                        if (check == false) {
-//                            ui.showBasicInfo(weatherService, location, storage);
-//                        }
-//                    } else {
-//                        ui.showBasicInfo(weatherService, location, storage);
-//                    }
-//                    Scanner scanner = new Scanner(System.in);
-//                    System.out.print("\nEnter any key to continue: ");
-//                    String inputChar = scanner.nextLine();
-//
-//                    break;
-//                }
-//
-//                case 3: {
-//
-//                    File file;
-//                    if (location.getName() != "") {
-//                        file = new File("SunInfo.txt");
-//                    } else {
-//                        file = new File("SunInfo1.txt");
-//                    }
-//                    if (file.exists()) {
-//                        boolean check = storage.checkSunInfo(location);
-//                        if (check == false) {
-//                            ui.showSunriseSunset(weatherService, location, storage);
-//                        }
-//                    } else {
-//                        ui.showSunriseSunset(weatherService, location, storage);
-//                    }
-//                    Scanner scanner = new Scanner(System.in);
-//                    System.out.print("\nEnter any key to continue: ");
-//                    String inputChar = scanner.nextLine();
-//
-//                    break;
-//                }
-//
-//                case 4: {
-//                    File file;
-//                    if (location.getName() != "") {
-//                        file = new File("ForecastInfo.txt");
-//                    } else {
-//                        file = new File("ForecastInfo1.txt");
-//                    }
-//                    if (file.exists()) {
-//                        boolean check = storage.checkForecastInfo(location);
-//                        if (check == false) {
-//                            ui.showWeatherForecast(weatherService, location, storage);
-//                        }
-//                    } else {
-//                        ui.showWeatherForecast(weatherService, location, storage);
-//                    }
-//                    Scanner scanner = new Scanner(System.in);
-//                    System.out.print("\nEnter any key to continue: ");
-//                    String inputChar = scanner.nextLine();
-//
-//                    break;
-//                }
-//
-//                case 5: {
-//
-//                    File file;
-//                    if (location.getName() != "") {
-//                        System.out.println("Weather API Donot exist for this");
-//                        break;
-//                    }
-//                    file = new File("AirPollution1.txt");
-//
-//                    if (file.exists()) {
-//                        boolean check = storage.checkAirPollution(location);
-//                        if (check == false) {
-//                            ui.showAirPollution(weatherService, location, storage);
-//                        }
-//                    } else {
-//                        ui.showAirPollution(weatherService, location, storage);
-//                    }
-//                    Scanner scanner = new Scanner(System.in);
-//                    System.out.print("\nEnter any key to continue: ");
-//                    String inputChar = scanner.nextLine();
-//
-//                    break;
-//                }
-//
-//                case 6: {
-//
-//                    File file;
-//                    if (location.getName() != "") {
-//                        System.out.println("Weather API Don't exist for this");
-//                        break;
-//                    }
-//
-//                    file = new File("AirPollution1.txt");
-//
-//                    if (file.exists()) {
-//                        boolean check = storage.checkPollutingGases(location);
-//
-//                        if (check == false) {
-//                            ui.showPollutingGases(weatherService, location, storage);
-//                        }
-//                    }
-//                    else {
-//                        ui.showPollutingGases(weatherService, location, storage);
-//                    }
-//
-//                    Scanner scanner = new Scanner(System.in);
-//                    System.out.print("\nEnter any key to continue: ");
-//                    String inputChar = scanner.nextLine();
-//                    break;
-//                }
-//
-//                case 7:
-//                    System.out.println("Exiting weather app.");
-//                    return;
-//
-//                default:
-//                    System.out.println("Invalid choice.");
-//            }
-//        }
+        // Storage storage = new FileStorage();
+        // WeatherService weatherService = new WeatherServiceImpl(); // Replace
+        //
+        // // List<Location> locationsByLatLng = ui.getLocationsByLatLngInput();
+        // // // Get multiple locations by city/country name
+        // // List<Location> locationsByCity = ui.getLocationsByCityInput();
+        //
+        // int option;
+        // Scanner scanner1 = new Scanner(System.in);
+        // Location location = new Location();
+        //
+        // while (true) {
+        //
+        // System.out.print("\nPress 1 if you want to check weather with Latitude and
+        // longitude ");
+        // System.out.print("\nPress 2 if you want to check weather with city/country
+        // name ");
+        // System.out.print("\nEnter your choice: ");
+        //
+        // option = scanner1.nextInt();
+        //
+        // if (option == 1) {
+        //
+        // while (true) {
+        //
+        // int obj;
+        // System.out.print("\nPress 1 if you want to add new Latitude and longitude ");
+        // System.out.print("\nPress 2 if you want to use saved Latitude and longitude
+        // ");
+        // System.out.print("\nEnter your choice: ");
+        //
+        // obj = scanner1.nextInt();
+        //
+        // if (obj == 1) {
+        // location = ui.getLocationCoord();
+        // storage.saveLocationCoord(location);
+        // break;
+        // } else if (obj == 2) {
+        //
+        // File file = new File("LocationCoord.txt");
+        //
+        // if (file.exists()) {
+        // location = storage.getLocationCoord();
+        // break;
+        // }
+        //
+        // else {
+        // System.out.print("\nNo saved Longitude and Latitude!!");
+        // }
+        //
+        // } else {
+        // System.out.print("\nYou Entered an invalid choice!! ");
+        //
+        // }
+        //
+        // }
+        // break;
+        // }
+        //
+        // else if (option == 2) {
+        // while (true) {
+        // int obj;
+        // System.out.print("\nPress 1 if you want to add new city/country name ");
+        // System.out.print("\nPress 2 if you want to use saved city/country name ");
+        // System.out.print("\nEnter your choice: ");
+        //
+        // obj = scanner1.nextInt();
+        //
+        // if (obj == 1) {
+        // location = ui.getLocationName();
+        // storage.saveLocationName(location);
+        // break;
+        // } else if (obj == 2) {
+        //
+        // File file = new File("LocationName.txt");
+        //
+        // if (file.exists()) {
+        // location = storage.getLocationName();
+        // break;
+        // } else {
+        // System.out.print("\nNo saved Locations!!");
+        // }
+        // } else {
+        // System.out.print("\nYou Entered an invalid choice!! ");
+        // break;
+        // }
+        //
+        // }
+        // break;
+        // }
+        //
+        // else {
+        // System.out.print("\nYou Entered an invalid choice!! ");
+        // }
+        // }
+        //
+        // while (true) {
+        //
+        // int choice = ui.getMenuChoice();
+        //
+        // switch (choice) {
+        //
+        // case 1: {
+        //
+        // File file;
+        // if (location.getName() != "") {
+        //
+        // file = new File("CurrentInfo.txt");
+        // } else {
+        // file = new File("CurrentInfo1.txt");
+        // }
+        // if (file.exists()) {
+        //
+        // boolean check = storage.checkCurrentInfo(location);
+        //
+        // if (check == false) {
+        // ui.showCurrentWeather(weatherService, location, storage);
+        // }
+        // } else {
+        // ui.showCurrentWeather(weatherService, location, storage);
+        // }
+        //
+        // Scanner scanner = new Scanner(System.in);
+        // System.out.print("\nEnter any key to continue: ");
+        // String inputChar = scanner.nextLine();
+        //
+        // break;
+        // }
+        //
+        // case 2: {
+        // File file;
+        // if (location.getName() != "") {
+        // file = new File("BasicInfo.txt");
+        // } else {
+        // file = new File("BasicInfo1.txt");
+        // }
+        // if (file.exists()) {
+        // boolean check = storage.checkBasicInfo(location);
+        // if (check == false) {
+        // ui.showBasicInfo(weatherService, location, storage);
+        // }
+        // } else {
+        // ui.showBasicInfo(weatherService, location, storage);
+        // }
+        // Scanner scanner = new Scanner(System.in);
+        // System.out.print("\nEnter any key to continue: ");
+        // String inputChar = scanner.nextLine();
+        //
+        // break;
+        // }
+        //
+        // case 3: {
+        //
+        // File file;
+        // if (location.getName() != "") {
+        // file = new File("SunInfo.txt");
+        // } else {
+        // file = new File("SunInfo1.txt");
+        // }
+        // if (file.exists()) {
+        // boolean check = storage.checkSunInfo(location);
+        // if (check == false) {
+        // ui.showSunriseSunset(weatherService, location, storage);
+        // }
+        // } else {
+        // ui.showSunriseSunset(weatherService, location, storage);
+        // }
+        // Scanner scanner = new Scanner(System.in);
+        // System.out.print("\nEnter any key to continue: ");
+        // String inputChar = scanner.nextLine();
+        //
+        // break;
+        // }
+        //
+        // case 4: {
+        // File file;
+        // if (location.getName() != "") {
+        // file = new File("ForecastInfo.txt");
+        // } else {
+        // file = new File("ForecastInfo1.txt");
+        // }
+        // if (file.exists()) {
+        // boolean check = storage.checkForecastInfo(location);
+        // if (check == false) {
+        // ui.showWeatherForecast(weatherService, location, storage);
+        // }
+        // } else {
+        // ui.showWeatherForecast(weatherService, location, storage);
+        // }
+        // Scanner scanner = new Scanner(System.in);
+        // System.out.print("\nEnter any key to continue: ");
+        // String inputChar = scanner.nextLine();
+        //
+        // break;
+        // }
+        //
+        // case 5: {
+        //
+        // File file;
+        // if (location.getName() != "") {
+        // System.out.println("Weather API Donot exist for this");
+        // break;
+        // }
+        // file = new File("AirPollution1.txt");
+        //
+        // if (file.exists()) {
+        // boolean check = storage.checkAirPollution(location);
+        // if (check == false) {
+        // ui.showAirPollution(weatherService, location, storage);
+        // }
+        // } else {
+        // ui.showAirPollution(weatherService, location, storage);
+        // }
+        // Scanner scanner = new Scanner(System.in);
+        // System.out.print("\nEnter any key to continue: ");
+        // String inputChar = scanner.nextLine();
+        //
+        // break;
+        // }
+        //
+        // case 6: {
+        //
+        // File file;
+        // if (location.getName() != "") {
+        // System.out.println("Weather API Don't exist for this");
+        // break;
+        // }
+        //
+        // file = new File("AirPollution1.txt");
+        //
+        // if (file.exists()) {
+        // boolean check = storage.checkPollutingGases(location);
+        //
+        // if (check == false) {
+        // ui.showPollutingGases(weatherService, location, storage);
+        // }
+        // }
+        // else {
+        // ui.showPollutingGases(weatherService, location, storage);
+        // }
+        //
+        // Scanner scanner = new Scanner(System.in);
+        // System.out.print("\nEnter any key to continue: ");
+        // String inputChar = scanner.nextLine();
+        // break;
+        // }
+        //
+        // case 7:
+        // System.out.println("Exiting weather app.");
+        // return;
+        //
+        // default:
+        // System.out.println("Invalid choice.");
+        // }
+        // }
     }
 }
