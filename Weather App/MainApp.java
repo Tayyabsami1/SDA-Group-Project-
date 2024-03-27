@@ -77,7 +77,7 @@ interface Storage {
     boolean checkSunInfo(Location location);
 
     void saveCurrentInfo(Location location, String main, String description, double temp, int pressure, int humidity,
-            double speed);
+                         double speed);
 
     boolean checkCurrentInfo(Location location);
 
@@ -299,7 +299,7 @@ class WeatherData {
     public Rain rain;
 
     public WeatherData(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
-            Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
+                       Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
         this.coord = coord;
         this.weather = weather;
         this.base = base;
@@ -449,7 +449,7 @@ class City {
     public long sunset;
 
     public City(int id, String name, Coord coord, String country, int population, int timezone, long sunrise,
-            long sunset) {
+                long sunset) {
         this.id = id;
         this.name = name;
         this.coord = coord;
@@ -800,7 +800,7 @@ class Main {
     }
 
     public Main(double temp, double feels_like, double temp_min, double temp_max, int pressure, int humidity,
-            int sea_level, int grnd_level, int temp_kf) {
+                int sea_level, int grnd_level, int temp_kf) {
         this.temp = temp;
         this.feels_like = feels_like;
         this.temp_min = temp_min;
@@ -1027,8 +1027,8 @@ class TerminalUI implements UserInterface {
         return scanner.nextInt();
     }
 
-    
-   public class Notification {
+
+    public class Notification {
         private String message;
 
         public Notification(String message) {
@@ -1190,7 +1190,7 @@ class TerminalUI implements UserInterface {
     }
 
     @Override
-   
+
     public void showAirPollution(WeatherService weatherService, Location location, Storage storage) {
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         AirPollution myPollutionData = weatherService.getPollutionData(myloc);
@@ -2067,7 +2067,7 @@ class FileStorage implements Storage {
 
     @Override
     public void saveCurrentInfo(Location location, String main, String description, double temp, int pressure,
-            int humidity, double speed) {
+                                int humidity, double speed) {
         try {
 
             File myFile;
@@ -2416,7 +2416,7 @@ class FileStorage implements Storage {
                     System.err.println("Error writing to file: " + e.getMessage());
                 }
             } else {
-                System.out.println("hello");
+
                 return;
             }
         } else {
@@ -2567,7 +2567,7 @@ class MainApp {
                 break;
             }
 
-             else if (option == 2) {
+            else if (option == 2) {
                 while (true) {
                     int obj;
                     System.out.print("\nPress 1 if you want to add new city/country name ");
@@ -2599,7 +2599,7 @@ class MainApp {
                 break;
             }
 
-             else {
+            else {
                 System.out.print("\nYou Entered an invalid choice!! ");
             }
         }
@@ -2711,8 +2711,8 @@ class MainApp {
                         System.out.println("Weather API Donot exist for this");
                         break;
                     }
-                        file = new File("AirPollution1.txt");
-                    
+                    file = new File("AirPollution1.txt");
+
                     if (file.exists()) {
                         boolean check = storage.checkAirPollution(location);
                         if (check == false) {
@@ -2736,7 +2736,7 @@ class MainApp {
                         break;
                     }
 
-                        file = new File("AirPollution1.txt");
+                    file = new File("AirPollution1.txt");
 
                     if (file.exists()) {
                         boolean check = storage.checkPollutingGases(location);
@@ -2745,13 +2745,13 @@ class MainApp {
                             ui.showPollutingGases(weatherService, location, storage);
                         }
                     }
-                     else {
+                    else {
                         ui.showPollutingGases(weatherService, location, storage);
                     }
 
                     Scanner scanner = new Scanner(System.in);
                     System.out.print("\nEnter any key to continue: ");
-                     String inputChar = scanner.nextLine();
+                    String inputChar = scanner.nextLine();
                     break;
                 }
 
