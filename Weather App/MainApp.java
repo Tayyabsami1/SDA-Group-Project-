@@ -1,3 +1,6 @@
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Scanner;
 import java.io.File;
 import java.util.ArrayList;
@@ -10,6 +13,8 @@ the dependencies are mentioned in Readme file.*/
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
@@ -44,17 +49,17 @@ interface UserInterface {
 
     int getMenuChoice();
 
-    void showCurrentWeather(WeatherService weatherService, Location location, Storage storage);
+    List<String> showCurrentWeather(WeatherService weatherService, Location location, Storage storage);
 
-    void showBasicInfo(WeatherService weatherService, Location location, Storage storage);
+   List<String> showBasicInfo(WeatherService weatherService, Location location, Storage storage);
 
-    void showSunriseSunset(WeatherService weatherService, Location location, Storage storage);
+    List<String> showSunriseSunset(WeatherService weatherService, Location location, Storage storage);
 
-    void showWeatherForecast(WeatherService weatherService, Location location, Storage storage);
+    Object[][] showWeatherForecast(WeatherService weatherService, Location location, Storage storage);
 
-    void showAirPollution(WeatherService weatherService, Location location, Storage storage);
+    int showAirPollution(WeatherService weatherService, Location location, Storage storage);
 
-    void showPollutingGases(WeatherService weatherService, Location location, Storage storage);
+    List<Double> showPollutingGases(WeatherService weatherService, Location location, Storage storage);
 
 }
 
@@ -1049,7 +1054,7 @@ class TerminalUI implements UserInterface {
 
 
     @Override
-    public void showCurrentWeather(WeatherService weatherService, Location location, Storage storage) {
+    public   List<String> showCurrentWeather(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         String main;
         String description;
@@ -1103,10 +1108,11 @@ class TerminalUI implements UserInterface {
         System.out.println("Weather: " + main + "\nDescription: " + description + "\nTemperature: " + temp +
                 "\nPressure: " + pressure + "\nHumidity: " + humidity + "\nWind Speed: " + speed);
         storage.saveCurrentInfo(location, main, description, temp, pressure, humidity, speed);
+        return new ArrayList<>();
     }
 
     @Override
-    public void showBasicInfo(WeatherService weatherService, Location location, Storage storage) {
+    public   List<String> showBasicInfo(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         double feels_like;
         double temp_min;
@@ -1125,10 +1131,11 @@ class TerminalUI implements UserInterface {
         System.out.println("\nFeels Like: " + feels_like + "\nMinimum Temperature: " + temp_min
                 + "\nMaximum Temperature: " + temp_max);
         storage.saveBasicInfo(location, feels_like, temp_min, temp_max);
+        return new ArrayList<>();
     }
 
     @Override
-    public void showSunriseSunset(WeatherService weatherService, Location location, Storage storage) {
+    public   List<String>showSunriseSunset(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         long sun_rise;
         long sun_set;
@@ -1152,10 +1159,11 @@ class TerminalUI implements UserInterface {
         System.out.print("\n***************Data fetched from API****************");
         System.out.println("\nSun Rise Time: " + SunR + "\nSun Set Time: " + SunS);
         storage.saveSunInfo(location, SunR, SunS);
+        return new ArrayList<>();
     }
 
     @Override
-    public void showWeatherForecast(WeatherService weatherService, Location location, Storage storage) {
+    public Object[][] showWeatherForecast(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         Forecast ForecastData;
         if (location.getName() == "") {
@@ -1187,11 +1195,13 @@ class TerminalUI implements UserInterface {
                     "\n\tTime of Data Forecasted: " + weather.getDtText() + "\n");
         }
         storage.saveForecastInfo(location, ForecastData);
+        Object[][]temp=null;
+        return temp;
     }
 
     @Override
 
-    public void showAirPollution(WeatherService weatherService, Location location, Storage storage) {
+    public int showAirPollution(WeatherService weatherService, Location location, Storage storage) {
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         AirPollution myPollutionData = weatherService.getPollutionData(myloc);
         int aqi = myPollutionData.getList().get(0).getMain().getAqi();
@@ -1219,9 +1229,10 @@ class TerminalUI implements UserInterface {
         notification.printAirQuality(airQuality);
 
         storage.saveAirPollution(location, aqi, myPollutionData.getList().get(0));
+        return 0;
     }
     @Override
-    public void showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
+    public  List<Double>showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
         AirPollution MyPollutionData = new AirPollution();
 
@@ -1237,6 +1248,7 @@ class TerminalUI implements UserInterface {
                 + object.getComponents().getPm2_5() +
                 "\nPM10: " + object.getComponents().getPm10() + "\nNH3: " + object.getComponents().getNh3());
         storage.saveAirPollution(location, aqi, MyPollutionData.getList().get(0));
+        return new ArrayList<>();
     }
 }
 
@@ -2507,262 +2519,1182 @@ class Notification {
 
 // Changing the Name of the start point
 // ! Also changed the name of the file so that it runs
-class MainApp {
+class InputGUI extends JFrame {
+    private JTextField locationField;
+    private JTextField longitudeField;
+    private JTextField latitudeField;
 
-    public static void main(String[] args) {
-        UserInterface ui = new TerminalUI();
-        Storage storage = new FileStorage();
-        WeatherService weatherService = new WeatherServiceImpl(); // Replace
+    InputGUI() {
+        setTitle("Weather App - Input");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(400, 300);
+        setLocationRelativeTo(null);
 
-        // List<Location> locationsByLatLng = ui.getLocationsByLatLngInput();
-        // // Get multiple locations by city/country name
-        // List<Location> locationsByCity = ui.getLocationsByCityInput();
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
 
-        int option;
-        Scanner scanner1 = new Scanner(System.in);
-        Location location = new Location();
+        JLabel locationLabel = new JLabel("Location:");
+        panel.add(locationLabel, gbc);
 
-        while (true) {
+        gbc.gridx++;
+        locationField = new JTextField(20);
+        panel.add(locationField, gbc);
 
-            System.out.print("\nPress 1 if you want to check weather with Latitude and longitude ");
-            System.out.print("\nPress 2 if you want to check weather with city/country name ");
-            System.out.print("\nEnter your choice: ");
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel longitudeLabel = new JLabel("Longitude:");
+        panel.add(longitudeLabel, gbc);
 
-            option = scanner1.nextInt();
+        gbc.gridx++;
+        longitudeField = new JTextField(20);
+        panel.add(longitudeField, gbc);
 
-            if (option == 1) {
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel latitudeLabel = new JLabel("Latitude:");
+        panel.add(latitudeLabel, gbc);
 
-                while (true) {
+        gbc.gridx++;
+        latitudeField = new JTextField(20);
+        panel.add(latitudeField, gbc);
 
-                    int obj;
-                    System.out.print("\nPress 1 if you want to add new Latitude and longitude ");
-                    System.out.print("\nPress 2 if you want to use saved Latitude and longitude ");
-                    System.out.print("\nEnter your choice: ");
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+        JButton submitButton = new JButton("Submit");
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String location = locationField.getText();
+                double longitude = Double.parseDouble(longitudeField.getText());
+                double latitude = Double.parseDouble(latitudeField.getText());
 
-                    obj = scanner1.nextInt();
-
-                    if (obj == 1) {
-                        location = ui.getLocationCoord();
-                        storage.saveLocationCoord(location);
-                        break;
-                    } else if (obj == 2) {
-
-                        File file = new File("LocationCoord.txt");
-
-                        if (file.exists()) {
-                            location = storage.getLocationCoord();
-                            break;
-                        }
-
-                        else {
-                            System.out.print("\nNo saved Longitude and Latitude!!");
-                        }
-
-                    } else {
-                        System.out.print("\nYou Entered an invalid choice!! ");
-
-                    }
-
-                }
-                break;
+                MainMenu mainMenu = new MainMenu(location, longitude, latitude);
+                mainMenu.setVisible(true);
+                dispose(); // Close the input form
             }
+        });
+        panel.add(submitButton, gbc);
 
-            else if (option == 2) {
-                while (true) {
-                    int obj;
-                    System.out.print("\nPress 1 if you want to add new city/country name ");
-                    System.out.print("\nPress 2 if you want to use saved city/country name ");
-                    System.out.print("\nEnter your choice: ");
-
-                    obj = scanner1.nextInt();
-
-                    if (obj == 1) {
-                        location = ui.getLocationName();
-                        storage.saveLocationName(location);
-                        break;
-                    } else if (obj == 2) {
-
-                        File file = new File("LocationName.txt");
-
-                        if (file.exists()) {
-                            location = storage.getLocationName();
-                            break;
-                        } else {
-                            System.out.print("\nNo saved Locations!!");
-                        }
-                    } else {
-                        System.out.print("\nYou Entered an invalid choice!! ");
-                        break;
-                    }
-
-                }
-                break;
-            }
-
-            else {
-                System.out.print("\nYou Entered an invalid choice!! ");
-            }
-        }
-
-        while (true) {
-
-            int choice = ui.getMenuChoice();
-
-            switch (choice) {
-
-                case 1: {
-
-                    File file;
-                    if (location.getName() != "") {
-
-                        file = new File("CurrentInfo.txt");
-                    } else {
-                        file = new File("CurrentInfo1.txt");
-                    }
-                    if (file.exists()) {
-
-                        boolean check = storage.checkCurrentInfo(location);
-
-                        if (check == false) {
-                            ui.showCurrentWeather(weatherService, location, storage);
-                        }
-                    } else {
-                        ui.showCurrentWeather(weatherService, location, storage);
-                    }
-
-                    Scanner scanner = new Scanner(System.in);
-                    System.out.print("\nEnter any key to continue: ");
-                    String inputChar = scanner.nextLine();
-
-                    break;
-                }
-
-                case 2: {
-                    File file;
-                    if (location.getName() != "") {
-                        file = new File("BasicInfo.txt");
-                    } else {
-                        file = new File("BasicInfo1.txt");
-                    }
-                    if (file.exists()) {
-                        boolean check = storage.checkBasicInfo(location);
-                        if (check == false) {
-                            ui.showBasicInfo(weatherService, location, storage);
-                        }
-                    } else {
-                        ui.showBasicInfo(weatherService, location, storage);
-                    }
-                    Scanner scanner = new Scanner(System.in);
-                    System.out.print("\nEnter any key to continue: ");
-                    String inputChar = scanner.nextLine();
-
-                    break;
-                }
-
-                case 3: {
-
-                    File file;
-                    if (location.getName() != "") {
-                        file = new File("SunInfo.txt");
-                    } else {
-                        file = new File("SunInfo1.txt");
-                    }
-                    if (file.exists()) {
-                        boolean check = storage.checkSunInfo(location);
-                        if (check == false) {
-                            ui.showSunriseSunset(weatherService, location, storage);
-                        }
-                    } else {
-                        ui.showSunriseSunset(weatherService, location, storage);
-                    }
-                    Scanner scanner = new Scanner(System.in);
-                    System.out.print("\nEnter any key to continue: ");
-                    String inputChar = scanner.nextLine();
-
-                    break;
-                }
-
-                case 4: {
-                    File file;
-                    if (location.getName() != "") {
-                        file = new File("ForecastInfo.txt");
-                    } else {
-                        file = new File("ForecastInfo1.txt");
-                    }
-                    if (file.exists()) {
-                        boolean check = storage.checkForecastInfo(location);
-                        if (check == false) {
-                            ui.showWeatherForecast(weatherService, location, storage);
-                        }
-                    } else {
-                        ui.showWeatherForecast(weatherService, location, storage);
-                    }
-                    Scanner scanner = new Scanner(System.in);
-                    System.out.print("\nEnter any key to continue: ");
-                    String inputChar = scanner.nextLine();
-
-                    break;
-                }
-
-                case 5: {
-
-                    File file;
-                    if (location.getName() != "") {
-                        System.out.println("Weather API Donot exist for this");
-                        break;
-                    }
-                    file = new File("AirPollution1.txt");
-
-                    if (file.exists()) {
-                        boolean check = storage.checkAirPollution(location);
-                        if (check == false) {
-                            ui.showAirPollution(weatherService, location, storage);
-                        }
-                    } else {
-                        ui.showAirPollution(weatherService, location, storage);
-                    }
-                    Scanner scanner = new Scanner(System.in);
-                    System.out.print("\nEnter any key to continue: ");
-                    String inputChar = scanner.nextLine();
-
-                    break;
-                }
-
-                case 6: {
-
-                    File file;
-                    if (location.getName() != "") {
-                        System.out.println("Weather API Don't exist for this");
-                        break;
-                    }
-
-                    file = new File("AirPollution1.txt");
-
-                    if (file.exists()) {
-                        boolean check = storage.checkPollutingGases(location);
-
-                        if (check == false) {
-                            ui.showPollutingGases(weatherService, location, storage);
-                        }
-                    }
-                    else {
-                        ui.showPollutingGases(weatherService, location, storage);
-                    }
-
-                    Scanner scanner = new Scanner(System.in);
-                    System.out.print("\nEnter any key to continue: ");
-                    String inputChar = scanner.nextLine();
-                    break;
-                }
-
-                case 7:
-                    System.out.println("Exiting weather app.");
-                    return;
-
-                default:
-                    System.out.println("Invalid choice.");
-            }
-        }
+        add(panel);
     }
 }
 
+
+class MainMenu extends JFrame {
+    private static final int IMAGE_WIDTH = 720;
+    private static final int IMAGE_HEIGHT = 1280;
+
+    private BasicInfo basicInfo;
+    private ShowWeather showWeather;
+    private ShowSunTime showSunTime;
+    private ShowPollutingGases showPollutingGases;
+    private ShowAirData showAirData;
+    private ShowFiveForecast showFiveForecast;
+
+    MainMenu(String location, double longitude, double latitude) {
+        setTitle("Weather App - " + location);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(IMAGE_WIDTH, IMAGE_HEIGHT);
+        setLocationRelativeTo(null);
+
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg");
+        JLabel backgroundLabel = new JLabel(backgroundImage);
+        backgroundLabel.setBounds(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
+        layeredPane.add(backgroundLabel, Integer.valueOf(0));
+
+        Menu menu = new Menu();
+        int menuWidth = 400;
+        int menuHeight = 600;
+        int menuX = 150;
+        int menuY = 200;
+        menu.setBounds(menuX, menuY, menuWidth, menuHeight);
+        layeredPane.add(menu, Integer.valueOf(1));
+
+        basicInfo = new BasicInfo(menu);
+        basicInfo.setBounds(150, 200, menuWidth, menuHeight);
+        layeredPane.add(basicInfo, Integer.valueOf(2));
+        basicInfo.setVisible(false);
+
+        showWeather = new ShowWeather(menu);
+        showWeather.setBounds(150, 200, menuWidth, menuHeight);
+        layeredPane.add(showWeather, Integer.valueOf(3));
+        showWeather.setVisible(false);
+
+        showSunTime = new ShowSunTime(menu);
+        showSunTime.setBounds(150, 200, menuWidth, menuHeight);
+        layeredPane.add(showSunTime, Integer.valueOf(4));
+        showSunTime.setVisible(false);
+
+        showPollutingGases = new ShowPollutingGases(menu);
+        showPollutingGases.setBounds(150, 200, menuWidth, menuHeight);
+        layeredPane.add(showPollutingGases, Integer.valueOf(5));
+        showPollutingGases.setVisible(false);
+
+        showAirData = new ShowAirData(menu);
+        showAirData.setBounds(150, 200, menuWidth, menuHeight);
+        layeredPane.add(showAirData, Integer.valueOf(6));
+        showAirData.setVisible(false);
+
+        showFiveForecast = new ShowFiveForecast(menu);
+        showFiveForecast.setBounds(150, 200, menuWidth, menuHeight);
+        layeredPane.add(showFiveForecast, Integer.valueOf(7));
+        showFiveForecast.setVisible(false);
+        Storage storage = new FileStorage();
+        UserInterface ui = new JavaFX();
+        WeatherService weatherService = new WeatherServiceImpl(
+                "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=109a96ae51ebbed7fa95540a48ba65b2"); // Replace with actual API
+
+        Location loc=new Location("h",latitude,longitude);
+        menu.addPropertyChangeListener(evt -> {
+            if ("ShowCurrentWeatherButtonClicked".equals(evt.getPropertyName())) {
+                showWeather.setVisible(true);
+                basicInfo.setVisible(false);
+                showSunTime.setVisible(false);
+                showPollutingGases.setVisible(false);
+                showAirData.setVisible(false);
+                showFiveForecast.setVisible(false);
+                List<String> i=new ArrayList<>();
+                i=  ui.showCurrentWeather(weatherService,loc,storage);
+                showWeather.updateWeatherInfo(i.get(0),i.get(1),Double.parseDouble(i.get(2)),Integer.parseInt(i.get(3)),Integer.parseInt(i.get(4)),Double.parseDouble(i.get(5)));
+                showWeather.setVisible(true);
+            } else if ("ShowBasicInfoButtonClicked".equals(evt.getPropertyName())) {
+                basicInfo.setVisible(true);
+                showWeather.setVisible(false);
+                showSunTime.setVisible(false);
+                showPollutingGases.setVisible(false);
+                showAirData.setVisible(false);
+                showFiveForecast.setVisible(false);
+                List<String>i=new ArrayList<>();
+                i=  ui.showBasicInfo(weatherService,loc,storage);
+                basicInfo.updateWeatherInfo(Double.parseDouble(i.get(0)),Double.parseDouble(i.get(1)),Double.parseDouble(i.get(2)));
+                basicInfo.setVisible(true);
+            } else if ("ShowSunTimeButtonClicked".equals(evt.getPropertyName())) {
+                showSunTime.setVisible(true);
+                basicInfo.setVisible(false);
+                showWeather.setVisible(false);
+                showPollutingGases.setVisible(false);
+                showAirData.setVisible(false);
+                showFiveForecast.setVisible(false);
+                List<String>i=new ArrayList<>();
+                i=  ui.showSunriseSunset(weatherService,loc,storage);
+                showSunTime.update_suntime(i.get(0),i.get(1));
+                showSunTime.setVisible(true);
+            } else if ("ShowPollutingGasesButtonClicked".equals(evt.getPropertyName())) {
+                showSunTime.setVisible(false);
+                basicInfo.setVisible(false);
+                showWeather.setVisible(false);
+                showPollutingGases.setVisible(true);
+                showAirData.setVisible(false);
+                showFiveForecast.setVisible(false);
+                List<Double>i=new ArrayList<>();
+                i=  ui.showPollutingGases(weatherService,loc,storage);
+                showPollutingGases.updatePollutingGasesInfo(i);
+                showPollutingGases.setVisible(true);
+            } else if ("ShowAirDataButtonClicked".equals(evt.getPropertyName())) {
+                showSunTime.setVisible(false);
+                basicInfo.setVisible(false);
+                showWeather.setVisible(false);
+                showPollutingGases.setVisible(false);
+                showAirData.setVisible(true);
+                showFiveForecast.setVisible(false);
+                int i;
+                i=  ui.showAirPollution(weatherService,loc,storage);
+                showAirData.updateaqi(i);
+                showAirData.setVisible(true);
+            } else if ("ShowWeatherForecastButtonClicked".equals(evt.getPropertyName())) {
+                // Fetch weather forecast data and show it
+                showSunTime.setVisible(false);
+                basicInfo.setVisible(false);
+                showWeather.setVisible(false);
+                showPollutingGases.setVisible(false);
+                showAirData.setVisible(false);
+                showFiveForecast.setVisible(true);
+                Object[][]fore;
+                fore=  ui.showWeatherForecast(weatherService,loc,storage);
+                showFiveForecast.updateForecastData(fore);
+                showFiveForecast.setVisible(true);
+            }
+            else if ("ShowExit".equals(evt.getPropertyName())){
+                JOptionPane.showMessageDialog(null, "Thank you for using the application! Goodbye!");
+                // Exit the application
+                System.exit(0);
+            }
+
+        });
+
+        setContentPane(layeredPane);
+        setVisible(true);
+    }
+
+
+}
+
+
+class Menu extends JPanel {
+    Menu() {
+        setOpaque(false);
+        setLayout(new GridBagLayout());
+        setPreferredSize(new Dimension(800, 600));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(20, 20, 20, 20);
+
+        addButton("Show current weather conditions", gbc);
+        addButton("Show basic information", gbc);
+        addButton("Show sunrise and sunset time", gbc);
+        addButton("Show weather forecast for 5 days", gbc);
+        addButton("Show Air Pollution data", gbc);
+        addButton("Show data about polluting gases", gbc);
+        addButton("Exit", gbc);
+    }
+
+    private void addButton(String buttonText, GridBagConstraints gbc) {
+        JButton button = new JButton(buttonText);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (buttonText.equals("Show current weather conditions")) {
+                    firePropertyChange("ShowCurrentWeatherButtonClicked", false, true);
+                } else if (buttonText.equals("Show basic information")) {
+                    firePropertyChange("ShowBasicInfoButtonClicked", false, true);
+                } else if (buttonText.equals("Show sunrise and sunset time")) {
+                    firePropertyChange("ShowSunTimeButtonClicked", false, true);
+                } else if (buttonText.equals("Show weather forecast for 5 days")) {
+                    firePropertyChange("ShowWeatherForecastButtonClicked", false, true);
+                } else if (buttonText.equals("Show Air Pollution data")) {
+                    firePropertyChange("ShowAirDataButtonClicked", false, true);
+                } else if (buttonText.equals("Show data about polluting gases")) {
+                    firePropertyChange("ShowPollutingGasesButtonClicked", false, true);
+                } else {
+                    firePropertyChange("ShowExit", false, true);
+                }
+            }
+        });
+
+        gbc.gridy++;
+        add(button, gbc);
+    }
+
+    public String getCurrentDate() {
+        return new SimpleDateFormat("MMMM dd, yyyy").format(new Date());
+    }
+}
+
+
+
+class ShowWeather extends JPanel {
+    private JLabel weatherLabel;
+    private JLabel descriptionLabel;
+    private JLabel temperatureLabel;
+    private JLabel pressureLabel;
+    private JLabel humidityLabel;
+    private JLabel windSpeedLabel;
+
+    ShowWeather(Menu menu) {
+        setLayout(new GridBagLayout());
+
+        // Set background image
+
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        // Adjust font size and color
+        Font labelFont = new Font("Arial", Font.BOLD, 16);
+        Color labelColor = Color.WHITE; // Set font color to white
+
+        weatherLabel = new JLabel("Current Weather: ");
+        weatherLabel.setFont(labelFont);
+        weatherLabel.setForeground(labelColor);
+        add(weatherLabel, gbc);
+
+        gbc.gridy++;
+        descriptionLabel = new JLabel("Weather Description: ");
+        descriptionLabel.setFont(labelFont);
+        descriptionLabel.setForeground(labelColor);
+        add(descriptionLabel, gbc);
+
+        gbc.gridy++;
+        temperatureLabel = new JLabel("Temperature: ");
+        temperatureLabel.setFont(labelFont);
+        temperatureLabel.setForeground(labelColor);
+        add(temperatureLabel, gbc);
+
+        gbc.gridy++;
+        pressureLabel = new JLabel("Pressure: ");
+        pressureLabel.setFont(labelFont);
+        pressureLabel.setForeground(labelColor);
+        add(pressureLabel, gbc);
+
+        gbc.gridy++;
+        humidityLabel = new JLabel("Humidity: ");
+        humidityLabel.setFont(labelFont);
+        humidityLabel.setForeground(labelColor);
+        add(humidityLabel, gbc);
+
+        gbc.gridy++;
+        windSpeedLabel = new JLabel("Wind Speed: ");
+        windSpeedLabel.setFont(labelFont);
+        windSpeedLabel.setForeground(labelColor);
+        add(windSpeedLabel, gbc);
+
+        gbc.gridy++;
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                menu.setVisible(true);
+            }
+        });
+        add(backButton, gbc);
+    }
+
+    // Method to update current weather information
+    public void updateWeatherInfo(String weather, String description, double temperature, double pressure, double humidity, double windSpeed) {
+        weatherLabel.setText("Current Weather: " + weather);
+        descriptionLabel.setText("Weather Description: " + description);
+        temperatureLabel.setText("Temperature: " + temperature + "°C");
+        pressureLabel.setText("Pressure: " + pressure + " hPa");
+        humidityLabel.setText("Humidity: " + humidity + "%");
+        windSpeedLabel.setText("Wind Speed: " + windSpeed + " m/s");
+    }
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg"); // Adjust image path
+        g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+    }
+}
+
+
+class BasicInfo extends JPanel {
+    private JLabel feelsLikeLabel;
+    private JLabel minTempLabel;
+    private JLabel maxTempLabel;
+
+    BasicInfo(Menu menu) {
+        setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        // Adjust font size and color
+        Font labelFont = new Font("Arial", Font.BOLD, 16);
+        Color labelColor = Color.white;
+
+        feelsLikeLabel = new JLabel("Feels Like: ");
+        feelsLikeLabel.setFont(labelFont);
+        feelsLikeLabel.setForeground(labelColor);
+        add(feelsLikeLabel, gbc);
+
+        gbc.gridy++;
+        minTempLabel = new JLabel("Minimum Temperature: ");
+        minTempLabel.setFont(labelFont);
+        minTempLabel.setForeground(labelColor);
+        add(minTempLabel, gbc);
+
+        gbc.gridy++;
+        maxTempLabel = new JLabel("Maximum Temperature: ");
+        maxTempLabel.setFont(labelFont);
+        maxTempLabel.setForeground(labelColor);
+        add(maxTempLabel, gbc);
+
+        gbc.gridy++;
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                menu.setVisible(true);
+            }
+        });
+        add(backButton, gbc);
+    }
+
+    // Method to update weather information
+    public void updateWeatherInfo(double feelsLike, double minTemp, double maxTemp) {
+        feelsLikeLabel.setText("Feels Like: " + feelsLike + " Kelvin");
+        minTempLabel.setText("Minimum Temperature: " + minTemp + " Kelvin");
+        maxTempLabel.setText("Maximum Temperature: " + maxTemp + " Kelvin");
+    }
+
+    // Method to set background image
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg"); // Adjust image path
+        g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+    }
+}
+
+
+class ShowSunTime extends JPanel {
+    private JLabel mainHeading;
+    private JLabel sunriseLabel;
+    private JLabel sunsetLabel;
+    private JLabel sunriseTimeLabel;
+    private JLabel sunsetTimeLabel;
+
+    ShowSunTime(Menu menu) {
+        setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        Color labelColor = Color.WHITE;
+        // Add main heading
+        mainHeading = new JLabel("Sunrise and Sunset Time");
+        mainHeading.setForeground(labelColor);
+        mainHeading.setFont(new Font("Arial", Font.BOLD, 20));
+        add(mainHeading, gbc);
+
+        gbc.gridy++;
+        // Add subheading for sunrise time
+        sunriseLabel = new JLabel("Sunrise Time:");
+        sunriseLabel.setForeground(labelColor);
+        sunriseLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        add(sunriseLabel, gbc);
+
+        // Simulating sunrise time, replace this with actual sunrise time logic
+        String sunriseTime = "06:30 AM";
+
+        gbc.gridx++;
+        sunriseTimeLabel = new JLabel(sunriseTime);
+        sunriseTimeLabel.setForeground(labelColor);
+        add(sunriseTimeLabel, gbc);
+
+        gbc.gridy++;
+        gbc.gridx = 0;
+        // Add subheading for sunset time
+        sunsetLabel = new JLabel("Sunset Time:");
+        sunsetLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        sunsetLabel.setForeground(labelColor);
+        add(sunsetLabel, gbc);
+
+        // Simulating sunset time, replace this with actual sunset time logic
+        String sunsetTime = "06:00 PM";
+
+        gbc.gridx++;
+        sunsetTimeLabel = new JLabel(sunsetTime);
+        add(sunsetTimeLabel, gbc);
+        sunsetTimeLabel.setForeground(labelColor);
+
+        gbc.gridy++;
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                menu.setVisible(true);
+            }
+        });
+        add(backButton, gbc);
+
+        // Set background image
+
+    }
+    public void update_suntime(String r,String s){
+
+        sunriseTimeLabel.setText(r);
+        sunsetTimeLabel.setText(s);
+    }
+
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg"); // Adjust image path
+        g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+    }
+}
+
+
+class ShowPollutingGases extends JPanel {
+    private JLabel pollutingGasesLabel;
+    private JTextArea detailsTextArea;
+    private JLabel coLabel;
+    private JLabel noLabel;
+    private JLabel no2Label;
+    private JLabel o3Label;
+    private JLabel so2Label;
+    private JLabel pm2Label;
+    private JLabel pm10Label;
+    private JLabel nh3Label;
+
+    ShowPollutingGases(Menu menu) {
+        setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 10, 5, 10);
+
+        // Adjust font size and color
+        Font labelFont = new Font("Arial", Font.BOLD, 16);
+        Color labelColor = Color.WHITE; // Set font color to white
+
+        pollutingGasesLabel = new JLabel("Details Of Polluting Gases:");
+        pollutingGasesLabel.setFont(labelFont);
+        pollutingGasesLabel.setForeground(labelColor);
+        add(pollutingGasesLabel, gbc);
+
+        gbc.gridy++;
+        detailsTextArea = new JTextArea(10, 30);
+        detailsTextArea.setEditable(false);
+        detailsTextArea.setOpaque(false);
+        detailsTextArea.setForeground(labelColor);
+        add(detailsTextArea, gbc);
+
+        // Initialize labels for each gas
+        coLabel = new JLabel("CO:");
+        noLabel = new JLabel("NO:");
+        no2Label = new JLabel("NO2:");
+        o3Label = new JLabel("O3:");
+        so2Label = new JLabel("SO2:");
+        pm2Label = new JLabel("PM2.5:");
+        pm10Label = new JLabel("PM10:");
+        nh3Label = new JLabel("NH3:");
+
+        // Set font and color for gas labels
+        coLabel.setFont(labelFont);
+        coLabel.setForeground(labelColor);
+        noLabel.setFont(labelFont);
+        noLabel.setForeground(labelColor);
+        no2Label.setFont(labelFont);
+        no2Label.setForeground(labelColor);
+        o3Label.setFont(labelFont);
+        o3Label.setForeground(labelColor);
+        so2Label.setFont(labelFont);
+        so2Label.setForeground(labelColor);
+        pm2Label.setFont(labelFont);
+        pm2Label.setForeground(labelColor);
+        pm10Label.setFont(labelFont);
+        pm10Label.setForeground(labelColor);
+        nh3Label.setFont(labelFont);
+        nh3Label.setForeground(labelColor);
+
+        // Add gas labels to panel
+        gbc.gridy++;
+        gbc.insets = new Insets(5, 10, 10, 10);
+        add(coLabel, gbc);
+
+        gbc.gridy++;
+        add(noLabel, gbc);
+
+        gbc.gridy++;
+        add(no2Label, gbc);
+
+        gbc.gridy++;
+        add(o3Label, gbc);
+
+        gbc.gridy++;
+        add(so2Label, gbc);
+
+        gbc.gridy++;
+        add(pm2Label, gbc);
+
+        gbc.gridy++;
+        add(pm10Label, gbc);
+
+        gbc.gridy++;
+        add(nh3Label, gbc);
+
+        // Add back button
+        gbc.gridy++;
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                menu.setVisible(true);
+            }
+        });
+        add(backButton, gbc);
+    }
+
+    // Method to update polluting gases details
+    void updatePollutingGasesInfo(List<Double> toxicityLevels) {
+        // Update toxicity levels for each gas
+        coLabel.setText("CO:                " + toxicityLevels.get(0));
+        noLabel.setText("NO:                " + toxicityLevels.get(1));
+        no2Label.setText("NO2:              " + toxicityLevels.get(2));
+        o3Label.setText("O3:                " + toxicityLevels.get(3));
+        so2Label.setText("SO2:              " + toxicityLevels.get(4));
+        pm2Label.setText("PM2.5:            " + toxicityLevels.get(5));
+        pm10Label.setText("PM10:            " + toxicityLevels.get(6));
+        nh3Label.setText("NH3:              " + toxicityLevels.get(7));
+    }
+
+    // Method to set background image
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg"); // Adjust image path
+        g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+    }
+}
+
+class ShowAirData extends JPanel {
+    private  JLabel airQualityIndexValueLabel;
+    ShowAirData(Menu menu) {
+        setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        // Add main heading
+        JLabel mainHeading = new JLabel("Air Pollution Data");
+        mainHeading.setFont(new Font("Arial", Font.BOLD, 20));
+        Color labelColor = Color.WHITE;
+        mainHeading.setForeground(labelColor);
+        add(mainHeading, gbc);
+
+        gbc.gridy++;
+        // Add subheading for air quality index
+        JLabel airQualityIndexLabel = new JLabel("Air Quality Index:");
+        airQualityIndexLabel.setForeground(labelColor);
+        airQualityIndexLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        add(airQualityIndexLabel, gbc);
+
+        // Simulating air quality index, replace this with actual logic
+        int airQualityIndex = 85;
+
+        gbc.gridx++;
+        airQualityIndexValueLabel = new JLabel(Integer.toString(airQualityIndex));
+        airQualityIndexValueLabel.setForeground(labelColor);
+        add(airQualityIndexValueLabel, gbc);
+
+        gbc.gridy++;
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                menu.setVisible(true);
+            }
+        });
+        add(backButton, gbc);
+
+        // Set background image
+
+    }
+    public void updateaqi(int a){
+        airQualityIndexValueLabel.setText(Integer.toString(a));
+    }
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg"); // Adjust image path
+        g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+    }
+
+
+}
+
+class ShowFiveForecast extends JPanel {
+    private JTable table;
+
+    public ShowFiveForecast(Menu menu) {
+        setLayout(new BorderLayout());
+
+        // Create a table with 5 rows (one for each day) and appropriate columns
+        DefaultTableModel model = new DefaultTableModel(new Object[5][11], new String[]{"Day", "Weather", "Description", "Temperature", "Pressure", "Humidity", "Feels Like", "Min Temp", "Max Temp", "Wind Speed", "Time of Forecast"});
+        table = new JTable(model) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make cells non-editable
+            }
+        };
+
+        // Customize the appearance of the table
+        table.setFont(new Font("Arial", Font.PLAIN, 14)); // Set font
+        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16)); // Set header font
+
+        // Set preferred column widths
+        int[] columnWidths = {50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50}; // Adjust as needed
+        for (int i = 0; i < columnWidths.length; i++) {
+            table.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
+        }
+
+        // Set row height
+        for (int i=1;i<=31;i++) {
+            table.setRowHeight(i,15);
+        }
+        // Adjust row height as needed
+
+        // Add the table to a scroll pane to enable scrolling if needed
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(new Dimension(1300, 300)); // Adjust scroll pane size
+        add(scrollPane, BorderLayout.CENTER);
+
+        // Add back button
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(e -> {
+            setVisible(false);
+            menu.setVisible(true);
+        });
+        add(backButton, BorderLayout.SOUTH);
+
+        // Set panel size
+        setPreferredSize(new Dimension(1300, 400)); // Adjust panel size as needed
+    }
+
+    // Method to update the forecast data in the table
+    public void updateForecastData(Object[][] data) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        // Clear existing data
+        model.setRowCount(0);
+        // Add new data
+        for (Object[] rowData : data) {
+            model.addRow(rowData);
+        }
+    }
+
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        ImageIcon backgroundImage = new ImageIcon("weth.jpg"); // Adjust image path
+        g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+    }
+}
+
+
+
+
+
+
+
+class JavaFX implements UserInterface{
+    public void displayLocationOptions(List<Location> locations){}
+
+    public  Location getLocationInput(){  return new Location("h",1,1);}
+
+    public int getMenuChoice(){   InputGUI inputGUI = new InputGUI();
+        inputGUI.setVisible(true);
+        return 0;}
+
+
+     List<Location> getLocationsByLatLngInput(){return new ArrayList<>();}
+
+     List<Location> getLocationsByCityInput(){return new ArrayList<>();}
+    public Location getLocationName() {return new Location();}
+    public Location getLocationCoord(){return new Location();}
+
+    public List<String> showCurrentWeather(WeatherService weatherService,Location location,Storage storage ){
+        String main;
+        String description;
+        double temp;
+        int pressure;
+        int humidity;
+        double speed;
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        WeatherData Data = weatherService.getWeatherData(myloc);
+        temp=Data.getMain().getTemp();
+        pressure=Data.getMain().getPressure();
+        humidity=Data.getMain().getHumidity();
+        speed=Data.getWind().getSpeed();
+        main =Data.getWeather().get(0).getMain();
+        description=Data.getWeather().get(0).getDescription();
+        List<String>i=new ArrayList<>();
+        i.add(main);
+        i.add(description);
+        i.add(Double.toString(temp));
+        i.add(Integer.toString(pressure));
+        i.add(Integer.toString(humidity));
+        i.add(Double.toString(speed));
+
+        storage.saveCurrentInfo(location, main, description, temp,pressure,humidity,speed);
+        return i;
+    }
+
+    public  List<String> showBasicInfo(WeatherService weatherService, Location location,Storage storage){
+        double feels_like;
+        double temp_min;
+        double temp_max;
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        WeatherData Data = weatherService.getWeatherData(myloc);
+        feels_like=Data.getMain().getFeelsLike();
+        temp_min=Data.getMain().getTempMin();
+        temp_max=Data.getMain().getTempMax();
+        List<String>i=new ArrayList<>();
+
+        i.add(Double.toString(feels_like));
+        i.add(Double.toString(temp_min));
+        i.add(Double.toString(temp_max));
+        storage.saveBasicInfo(location, feels_like, temp_min, temp_max);
+        return i;
+    }
+
+    public  List<String> showSunriseSunset(WeatherService weatherService,Location location,Storage storage){
+        // Implement as required
+        long  sun_rise;
+        long  sun_set;
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        WeatherData Data = weatherService.getWeatherData(myloc);
+        sun_rise=Data.getSys().getSunrise();
+        sun_set=Data.getSys().getSunset();
+
+        // Convert timestamp to Date object (assuming seconds)
+        Date date1 = new Date(sun_rise * 1000); // Multiply by 1000 if milliseconds
+        Date date2 = new Date(sun_set * 1000);
+        // Format the date to "hh:mm:ss" format
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss"); // Use "HH" for 24-hour format
+        String SunR = formatter.format(date1);
+        String SunS = formatter.format(date2);
+        List<String>i=new ArrayList<>();
+        i.add(SunR);
+        i.add(SunS);
+
+        storage.saveSunInfo(location, SunR, SunS);
+        return i;
+    }
+
+    public  Object[][] showWeatherForecast(WeatherService weatherService, Location location,Storage storage){
+        // Implement as required
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+
+        Forecast ForecastData = weatherService.getForecastData(myloc);
+        List<WeatherData> list=ForecastData.getList();
+        // ! This returns a list of 40 weather forecase for the next 5 days each list
+        // contains forecast of 3hrs
+        System.out.println("Weather Forecast for 5 days : ");
+
+        Object[][] forecastData = new Object[list.size()][11];
+
+        int i = 0;
+        for (WeatherData weather : list) {
+            // Populate the array with data from each WeatherData object
+            forecastData[i][0] = i + 1; // Day
+            forecastData[i][1] = weather.getWeather().get(0).getMain(); // Weather
+            forecastData[i][2] = weather.getWeather().get(0).getDescription(); // Description
+            forecastData[i][3] = weather.getMain().getTemp(); // Temperature
+            forecastData[i][4] = weather.getMain().getPressure(); // Pressure
+            forecastData[i][5] = weather.getMain().getHumidity(); // Humidity
+            forecastData[i][6] = weather.getMain().getFeelsLike(); // Feels Like
+            forecastData[i][7] = weather.getMain().getTempMin(); // Minimum Temperature
+            forecastData[i][8] = weather.getMain().getTempMax(); // Maximum Temperature
+            forecastData[i][9] = weather.getWind().getSpeed(); // Wind Speed
+            forecastData[i][10] = weather.getDtText(); // Time of Data Forecasted
+
+            i++;
+        }
+        storage.saveForecastInfo(location,ForecastData);
+        return forecastData;
+    }
+
+    public  int showAirPollution(WeatherService weatherService,Location location,Storage storage){
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        AirPollution MyPollutionData=weatherService.getPollutionData(myloc);
+        int aqi=MyPollutionData.getList().get(0).getMain().getAqi();
+        storage.saveAirPollution(location,aqi,MyPollutionData.getList().get(0));
+        return aqi;
+    }
+
+    public  List<Double> showPollutingGases(WeatherService weatherService,Location location,Storage storage){
+        Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
+        AirPollution MyPollutionData=weatherService.getPollutionData(myloc);
+        AirQuality object=MyPollutionData.getList().get(0);
+        int aqi=MyPollutionData.getList().get(0).getMain().getAqi();
+        double co=object.getComponents().getCo();
+        double no=object.getComponents().getNo();
+        double no2=object.getComponents().getNo2();
+        double o3=object.getComponents().getO3();
+        double so2=object.getComponents().getSo2();
+        double pm2=object.getComponents().getPm2_5();
+        double pm10=object.getComponents().getPm10();
+        double nh3=object.getComponents().getNh3();
+
+        List<Double>i=new ArrayList<>();
+        i.add((double)(aqi));
+        i.add(co);
+        i.add(no);
+        i.add(no2);
+        i.add(o3);
+        i.add(so2);
+        i.add(pm2);
+        i.add(pm10);
+        i.add(nh3);
+
+        storage.saveAirPollution(location,aqi,MyPollutionData.getList().get(0));
+        return i;
+    }
+
+}
+class MainApp {
+
+    public static void main(String[] args) {
+        UserInterface ui = new JavaFX();
+        ui.getMenuChoice();
+//        Storage storage = new FileStorage();
+//        WeatherService weatherService = new WeatherServiceImpl(); // Replace
+//
+//        // List<Location> locationsByLatLng = ui.getLocationsByLatLngInput();
+//        // // Get multiple locations by city/country name
+//        // List<Location> locationsByCity = ui.getLocationsByCityInput();
+//
+//        int option;
+//        Scanner scanner1 = new Scanner(System.in);
+//        Location location = new Location();
+//
+//        while (true) {
+//
+//            System.out.print("\nPress 1 if you want to check weather with Latitude and longitude ");
+//            System.out.print("\nPress 2 if you want to check weather with city/country name ");
+//            System.out.print("\nEnter your choice: ");
+//
+//            option = scanner1.nextInt();
+//
+//            if (option == 1) {
+//
+//                while (true) {
+//
+//                    int obj;
+//                    System.out.print("\nPress 1 if you want to add new Latitude and longitude ");
+//                    System.out.print("\nPress 2 if you want to use saved Latitude and longitude ");
+//                    System.out.print("\nEnter your choice: ");
+//
+//                    obj = scanner1.nextInt();
+//
+//                    if (obj == 1) {
+//                        location = ui.getLocationCoord();
+//                        storage.saveLocationCoord(location);
+//                        break;
+//                    } else if (obj == 2) {
+//
+//                        File file = new File("LocationCoord.txt");
+//
+//                        if (file.exists()) {
+//                            location = storage.getLocationCoord();
+//                            break;
+//                        }
+//
+//                        else {
+//                            System.out.print("\nNo saved Longitude and Latitude!!");
+//                        }
+//
+//                    } else {
+//                        System.out.print("\nYou Entered an invalid choice!! ");
+//
+//                    }
+//
+//                }
+//                break;
+//            }
+//
+//            else if (option == 2) {
+//                while (true) {
+//                    int obj;
+//                    System.out.print("\nPress 1 if you want to add new city/country name ");
+//                    System.out.print("\nPress 2 if you want to use saved city/country name ");
+//                    System.out.print("\nEnter your choice: ");
+//
+//                    obj = scanner1.nextInt();
+//
+//                    if (obj == 1) {
+//                        location = ui.getLocationName();
+//                        storage.saveLocationName(location);
+//                        break;
+//                    } else if (obj == 2) {
+//
+//                        File file = new File("LocationName.txt");
+//
+//                        if (file.exists()) {
+//                            location = storage.getLocationName();
+//                            break;
+//                        } else {
+//                            System.out.print("\nNo saved Locations!!");
+//                        }
+//                    } else {
+//                        System.out.print("\nYou Entered an invalid choice!! ");
+//                        break;
+//                    }
+//
+//                }
+//                break;
+//            }
+//
+//            else {
+//                System.out.print("\nYou Entered an invalid choice!! ");
+//            }
+//        }
+//
+//        while (true) {
+//
+//            int choice = ui.getMenuChoice();
+//
+//            switch (choice) {
+//
+//                case 1: {
+//
+//                    File file;
+//                    if (location.getName() != "") {
+//
+//                        file = new File("CurrentInfo.txt");
+//                    } else {
+//                        file = new File("CurrentInfo1.txt");
+//                    }
+//                    if (file.exists()) {
+//
+//                        boolean check = storage.checkCurrentInfo(location);
+//
+//                        if (check == false) {
+//                            ui.showCurrentWeather(weatherService, location, storage);
+//                        }
+//                    } else {
+//                        ui.showCurrentWeather(weatherService, location, storage);
+//                    }
+//
+//                    Scanner scanner = new Scanner(System.in);
+//                    System.out.print("\nEnter any key to continue: ");
+//                    String inputChar = scanner.nextLine();
+//
+//                    break;
+//                }
+//
+//                case 2: {
+//                    File file;
+//                    if (location.getName() != "") {
+//                        file = new File("BasicInfo.txt");
+//                    } else {
+//                        file = new File("BasicInfo1.txt");
+//                    }
+//                    if (file.exists()) {
+//                        boolean check = storage.checkBasicInfo(location);
+//                        if (check == false) {
+//                            ui.showBasicInfo(weatherService, location, storage);
+//                        }
+//                    } else {
+//                        ui.showBasicInfo(weatherService, location, storage);
+//                    }
+//                    Scanner scanner = new Scanner(System.in);
+//                    System.out.print("\nEnter any key to continue: ");
+//                    String inputChar = scanner.nextLine();
+//
+//                    break;
+//                }
+//
+//                case 3: {
+//
+//                    File file;
+//                    if (location.getName() != "") {
+//                        file = new File("SunInfo.txt");
+//                    } else {
+//                        file = new File("SunInfo1.txt");
+//                    }
+//                    if (file.exists()) {
+//                        boolean check = storage.checkSunInfo(location);
+//                        if (check == false) {
+//                            ui.showSunriseSunset(weatherService, location, storage);
+//                        }
+//                    } else {
+//                        ui.showSunriseSunset(weatherService, location, storage);
+//                    }
+//                    Scanner scanner = new Scanner(System.in);
+//                    System.out.print("\nEnter any key to continue: ");
+//                    String inputChar = scanner.nextLine();
+//
+//                    break;
+//                }
+//
+//                case 4: {
+//                    File file;
+//                    if (location.getName() != "") {
+//                        file = new File("ForecastInfo.txt");
+//                    } else {
+//                        file = new File("ForecastInfo1.txt");
+//                    }
+//                    if (file.exists()) {
+//                        boolean check = storage.checkForecastInfo(location);
+//                        if (check == false) {
+//                            ui.showWeatherForecast(weatherService, location, storage);
+//                        }
+//                    } else {
+//                        ui.showWeatherForecast(weatherService, location, storage);
+//                    }
+//                    Scanner scanner = new Scanner(System.in);
+//                    System.out.print("\nEnter any key to continue: ");
+//                    String inputChar = scanner.nextLine();
+//
+//                    break;
+//                }
+//
+//                case 5: {
+//
+//                    File file;
+//                    if (location.getName() != "") {
+//                        System.out.println("Weather API Donot exist for this");
+//                        break;
+//                    }
+//                    file = new File("AirPollution1.txt");
+//
+//                    if (file.exists()) {
+//                        boolean check = storage.checkAirPollution(location);
+//                        if (check == false) {
+//                            ui.showAirPollution(weatherService, location, storage);
+//                        }
+//                    } else {
+//                        ui.showAirPollution(weatherService, location, storage);
+//                    }
+//                    Scanner scanner = new Scanner(System.in);
+//                    System.out.print("\nEnter any key to continue: ");
+//                    String inputChar = scanner.nextLine();
+//
+//                    break;
+//                }
+//
+//                case 6: {
+//
+//                    File file;
+//                    if (location.getName() != "") {
+//                        System.out.println("Weather API Don't exist for this");
+//                        break;
+//                    }
+//
+//                    file = new File("AirPollution1.txt");
+//
+//                    if (file.exists()) {
+//                        boolean check = storage.checkPollutingGases(location);
+//
+//                        if (check == false) {
+//                            ui.showPollutingGases(weatherService, location, storage);
+//                        }
+//                    }
+//                    else {
+//                        ui.showPollutingGases(weatherService, location, storage);
+//                    }
+//
+//                    Scanner scanner = new Scanner(System.in);
+//                    System.out.print("\nEnter any key to continue: ");
+//                    String inputChar = scanner.nextLine();
+//                    break;
+//                }
+//
+//                case 7:
+//                    System.out.println("Exiting weather app.");
+//                    return;
+//
+//                default:
+//                    System.out.println("Invalid choice.");
+//            }
+//        }
+    }
+}
