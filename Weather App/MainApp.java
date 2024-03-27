@@ -1346,7 +1346,26 @@ class FileStorage implements Storage {
         }
 
     }
+    public class Notification {
+        private String message;
 
+        public Notification(String message) {
+            this.message = message;
+        }
+
+        public void printWeatherCondition(String weatherCondition) {
+            System.out.println("+---------------------------------------------------------+");
+            System.out.println("| Weather Condition: " + weatherCondition);
+            System.out.println("+---------------------------------------------------------+");
+        }
+
+        public void printAirQuality(int aqi, String airQuality) {
+            System.out.println("+---------------------------------------------------------+");
+            System.out.println("| Air Quality Index: " + aqi);
+            System.out.println("| Air Quality: " + airQuality);
+            System.out.println("+---------------------------------------------------------+");
+        }
+    }
     @Override
     public boolean checkAirPollution(Location location) {
         String delimiter = ",";
@@ -1398,6 +1417,20 @@ class FileStorage implements Storage {
         if (check == false) {
             return false;
         }
+         String air_Quality;
+        int aqi = arr[index].getAqi();
+        if (aqi == 1) {
+            air_Quality = "Good";
+        } else if (aqi ==2) {
+            air_Quality = "Fair";
+        } else if (aqi == 3) {
+            air_Quality = "Moderate";
+        } else if (aqi == 4) {
+            air_Quality = "Poor";
+        } else {
+            air_Quality = "Very Poor";
+        }
+        Notification notification = new Notification("Air Pollution Data:");
         System.out.print("\n***************Data fetched from FILE****************");
         System.out.println("\nAir Pollution Data: \nAir Quality Index: " + arr[index].getAqi());
         return true;
