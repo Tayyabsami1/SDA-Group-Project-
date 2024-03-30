@@ -2616,7 +2616,7 @@ class InputGUI extends JFrame {
     }
 }
 
-class MainMenu extends JFrame {
+class MainMenu extends JFrame { // Storage object exists here to interchange with DB and FileStorage
     private static final int IMAGE_WIDTH = 720;
     private static final int IMAGE_HEIGHT = 1280;
 
@@ -2678,7 +2678,7 @@ class MainMenu extends JFrame {
         showFiveForecast.setBounds(150, 200, menuWidth, menuHeight);
         layeredPane.add(showFiveForecast, Integer.valueOf(7));
         showFiveForecast.setVisible(false);
-        Storage storage = new FileStorage();
+        Storage storage = new FileStorage(); //Storage can be interchanged
         UserInterface ui = new JavaFX();
         WeatherService weatherService = new WeatherServiceImpl(
                 "https://api.openweathermap.org/data/2.5/weather?lat=33.44&lon=94.04&date=2020-03-04&appid=109a96ae51ebbed7fa95540a48ba65b2"); // Replace
