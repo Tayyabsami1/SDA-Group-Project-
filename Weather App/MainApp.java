@@ -1359,9 +1359,9 @@ class FileStorage implements Storage {
             System.out.println("+---------------------------------------------------------+");
         }
 
-        public void printAirQuality(int aqi, String airQuality) {
+        public void printAirQuality( String airQuality) {
             System.out.println("+---------------------------------------------------------+");
-            System.out.println("| Air Quality Index: " + aqi);
+
             System.out.println("| Air Quality: " + airQuality);
             System.out.println("+---------------------------------------------------------+");
         }
@@ -1433,6 +1433,7 @@ class FileStorage implements Storage {
         Notification notification = new Notification("Air Pollution Data:");
         System.out.print("\n***************Data fetched from FILE****************");
         System.out.println("\nAir Pollution Data: \nAir Quality Index: " + arr[index].getAqi());
+         notification.printAirQuality( airQuality); 
         return true;
     }
 
@@ -2214,6 +2215,7 @@ class FileStorage implements Storage {
                 return false;
             }
             System.out.print("\n***************Data fetched from FILE****************");
+            Noification.printWeatherCondition( arr1[index].getDescription());
             System.out.println("\nWeather:  " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
                     + "\nTemperature: " + arr[index].getTemp() +
                     "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
@@ -2272,6 +2274,7 @@ class FileStorage implements Storage {
                 return false;
             }
             System.out.print("\n***************Data fetched from FILE****************");
+             Noification.printWeatherCondition( arr1[index].getDescription());
             System.out.println("\nWeather:  " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
                     + "\nTemperature: " + arr[index].getTemp() +
                     "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
