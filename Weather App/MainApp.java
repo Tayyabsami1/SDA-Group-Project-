@@ -2215,7 +2215,7 @@ class FileStorage implements Storage {
                 return false;
             }
             System.out.print("\n***************Data fetched from FILE****************");
-            Noification.printWeatherCondition( arr1[index].getDescription());
+            noification.printWeatherCondition( arr1[index].getDescription());
             System.out.println("\nWeather:  " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
                     + "\nTemperature: " + arr[index].getTemp() +
                     "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
@@ -2274,7 +2274,7 @@ class FileStorage implements Storage {
                 return false;
             }
             System.out.print("\n***************Data fetched from FILE****************");
-             Noification.printWeatherCondition( arr1[index].getDescription());
+             noification.printWeatherCondition( arr1[index].getDescription());
             System.out.println("\nWeather:  " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
                     + "\nTemperature: " + arr[index].getTemp() +
                     "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
