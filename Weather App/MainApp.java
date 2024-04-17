@@ -82,7 +82,7 @@ interface Storage {
     boolean checkSunInfo(Location location);
 
     void saveCurrentInfo(Location location, String main, String description, double temp, int pressure, int humidity,
-            double speed);
+                         double speed);
 
     boolean checkCurrentInfo(Location location);
 
@@ -304,7 +304,7 @@ class WeatherData {
     public Rain rain;
 
     public WeatherData(Coord coord, List<Weather> weather, String base, Main main, int visibility, Wind wind,
-            Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
+                       Clouds clouds, long dt, Sys sys, int timezone, int id, String name, int cod) {
         this.coord = coord;
         this.weather = weather;
         this.base = base;
@@ -454,7 +454,7 @@ class City {
     public long sunset;
 
     public City(int id, String name, Coord coord, String country, int population, int timezone, long sunrise,
-            long sunset) {
+                long sunset) {
         this.id = id;
         this.name = name;
         this.coord = coord;
@@ -805,7 +805,7 @@ class Main {
     }
 
     public Main(double temp, double feels_like, double temp_min, double temp_max, int pressure, int humidity,
-            int sea_level, int grnd_level, int temp_kf) {
+                int sea_level, int grnd_level, int temp_kf) {
         this.temp = temp;
         this.feels_like = feels_like;
         this.temp_min = temp_min;
@@ -1417,7 +1417,7 @@ class FileStorage implements Storage {
         if (check == false) {
             return false;
         }
-         String air_Quality;
+        String air_Quality;
         int aqi = arr[index].getAqi();
         if (aqi == 1) {
             air_Quality = "Good";
@@ -1433,7 +1433,7 @@ class FileStorage implements Storage {
         Notification notification = new Notification("Air Pollution Data:");
         System.out.print("\n***************Data fetched from FILE****************");
         System.out.println("\nAir Pollution Data: \nAir Quality Index: " + arr[index].getAqi());
-         notification.printAirQuality( airQuality); 
+        notification.printAirQuality( air_Quality);
         return true;
     }
 
@@ -2113,7 +2113,7 @@ class FileStorage implements Storage {
 
     @Override
     public void saveCurrentInfo(Location location, String main, String description, double temp, int pressure,
-            int humidity, double speed) {
+                                int humidity, double speed) {
         try {
 
             File myFile;
@@ -2155,132 +2155,132 @@ class FileStorage implements Storage {
 
     @Override
     public boolean checkCurrentInfo(Location location) {
-        String delimiter = ","; // Word to stop reading
-        int numberOfLines = 0;
-        LocalDate today = LocalDate.now();
-        if (location.getName() == "") {
-            boolean check = false;
-            try {
-                LineNumberReader reader = new LineNumberReader(new FileReader("CurrentInfo1.txt"));
-                while (reader.readLine() != null) {
-                    numberOfLines++;
-                }
-                reader.close();
-
-            } catch (IOException e) {
-                System.err.println("Error reading file: " + e.getMessage());
-            }
-            Main[] arr = new Main[numberOfLines];
-            Weather[] arr1 = new Weather[numberOfLines];
-            Wind[] arr2 = new Wind[numberOfLines];
-            Location[] arr3 = new Location[numberOfLines];
-            try {
-                Scanner scanner = new Scanner(new File("CurrentInfo1.txt"));
-                scanner.useDelimiter(delimiter); // Set delimiter for splitting
-
-                for (int i = 0; i < arr.length; i++) {
-                    arr[i] = new Main();
-                    arr1[i] = new Weather();
-                    arr2[i] = new Wind();
-                    arr3[i] = new Location();
-                    arr3[i].setLatitude(Double.parseDouble(scanner.next()));
-                    arr3[i].setLongitude(Double.parseDouble(scanner.next()));
-                    arr1[i].setMain(scanner.next());
-                    arr1[i].setDescription(scanner.next());
-                    arr[i].setTemp(Double.parseDouble(scanner.next()));
-                    arr[i].setPressure(Integer.parseInt(scanner.next()));
-                    arr[i].setHumidity(Integer.parseInt(scanner.next()));
-                    arr2[i].setSpeed(Double.parseDouble(scanner.next()));
-                    String firstLine = scanner.nextLine();
-                    arr[i].setDate(firstLine.substring(1));
-
-                }
-                scanner.close();
-            } catch (FileNotFoundException e) {
-                System.err.println("Error opening file:  " + e.getMessage());
-            }
-            int index = 0;
-            for (int i = 0; i < arr.length; i++) {
-
-                if (arr3[i].getLatitude() == location.getLatitude()
-                        && arr3[i].getLongitude() == location.getLongitude()) {
-                    if (arr[i].getDate().equals(String.valueOf(today))) {
-                        check = true;
-                        index = i;
-
-                    }
-                }
-            }
-            if (check == false) {
-                return false;
-            }
-            System.out.print("\n***************Data fetched from FILE****************");
-            noification.printWeatherCondition( arr1[index].getDescription());
-            System.out.println("\nWeather:  " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
-                    + "\nTemperature: " + arr[index].getTemp() +
-                    "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
-                    + arr2[index].getSpeed());
+//        String delimiter = ","; // Word to stop reading
+//        int numberOfLines = 0;
+//        LocalDate today = LocalDate.now();
+//        if (location.getName() == "") {
+//            boolean check = false;
+//            try {
+//                LineNumberReader reader = new LineNumberReader(new FileReader("CurrentInfo1.txt"));
+//                while (reader.readLine() != null) {
+//                    numberOfLines++;
+//                }
+//                reader.close();
+//
+//            } catch (IOException e) {
+//                System.err.println("Error reading file: " + e.getMessage());
+//            }
+//            Main[] arr = new Main[numberOfLines];
+//            Weather[] arr1 = new Weather[numberOfLines];
+//            Wind[] arr2 = new Wind[numberOfLines];
+//            Location[] arr3 = new Location[numberOfLines];
+//            try {
+//                Scanner scanner = new Scanner(new File("CurrentInfo1.txt"));
+//                scanner.useDelimiter(delimiter); // Set delimiter for splitting
+//
+//                for (int i = 0; i < arr.length; i++) {
+//                    arr[i] = new Main();
+//                    arr1[i] = new Weather();
+//                    arr2[i] = new Wind();
+//                    arr3[i] = new Location();
+//                    arr3[i].setLatitude(Double.parseDouble(scanner.next()));
+//                    arr3[i].setLongitude(Double.parseDouble(scanner.next()));
+//                    arr1[i].setMain(scanner.next());
+//                    arr1[i].setDescription(scanner.next());
+//                    arr[i].setTemp(Double.parseDouble(scanner.next()));
+//                    arr[i].setPressure(Integer.parseInt(scanner.next()));
+//                    arr[i].setHumidity(Integer.parseInt(scanner.next()));
+//                    arr2[i].setSpeed(Double.parseDouble(scanner.next()));
+//                    String firstLine = scanner.nextLine();
+//                    arr[i].setDate(firstLine.substring(1));
+//
+//                }
+//                scanner.close();
+//            } catch (FileNotFoundException e) {
+//                System.err.println("Error opening file:  " + e.getMessage());
+//            }
+//            int index = 0;
+//            for (int i = 0; i < arr.length; i++) {
+//
+//                if (arr3[i].getLatitude() == location.getLatitude()
+//                        && arr3[i].getLongitude() == location.getLongitude()) {
+//                    if (arr[i].getDate().equals(String.valueOf(today))) {
+//                        check = true;
+//                        index = i;
+//
+//                    }
+//                }
+//            }
+//            if (check == false) {
+//                return false;
+//            }
+//            System.out.print("\n***************Data fetched from FILE****************");
+//            notification.printWeatherCondition( arr1[index].getDescription());
+//            System.out.println("\nWeather:  " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
+//                    + "\nTemperature: " + arr[index].getTemp() +
+//                    "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
+//                    + arr2[index].getSpeed());
+//            return true;
+//        } else {
+//            boolean check = false;
+//            try {
+//                LineNumberReader reader = new LineNumberReader(new FileReader("CurrentInfo.txt"));
+//                while (reader.readLine() != null) {
+//                    numberOfLines++;
+//                }
+//                reader.close();
+//
+//            } catch (IOException e) {
+//                System.err.println("Error reading file: " + e.getMessage());
+//            }
+//            Main[] arr = new Main[numberOfLines];
+//            Weather[] arr1 = new Weather[numberOfLines];
+//            Wind[] arr2 = new Wind[numberOfLines];
+//            try {
+//                Scanner scanner = new Scanner(new File("CurrentInfo.txt"));
+//                scanner.useDelimiter(delimiter); // Set delimiter for splitting
+//
+//                for (int i = 0; i < arr.length; i++) {
+//                    arr[i] = new Main();
+//                    arr1[i] = new Weather();
+//                    arr2[i] = new Wind();
+//                    arr[i].setLocation(scanner.next());
+//                    arr1[i].setMain(scanner.next());
+//                    arr1[i].setDescription(scanner.next());
+//                    arr[i].setTemp(Double.parseDouble(scanner.next()));
+//                    arr[i].setPressure(Integer.parseInt(scanner.next()));
+//                    arr[i].setHumidity(Integer.parseInt(scanner.next()));
+//                    arr2[i].setSpeed(Double.parseDouble(scanner.next()));
+//                    String firstLine = scanner.nextLine();
+//                    arr[i].setDate(firstLine.substring(1));
+//
+//                }
+//                scanner.close();
+//            } catch (FileNotFoundException e) {
+//                System.err.println("Error opening file:  " + e.getMessage());
+//            }
+//            int index = 0;
+//            for (int i = 0; i < arr.length; i++) {
+//
+//                if (arr[i].getLocation().equalsIgnoreCase(location.getName())) {
+//                    if (arr[i].getDate().equals(String.valueOf(today))) {
+//                        check = true;
+//                        index = i;
+//
+//                    }
+//                }
+//            }
+//            if (check == false) {
+//                return false;
+//            }
+//            System.out.print("\n***************Data fetched from FILE****************");
+//            notification.printWeatherCondition( arr1[index].getDescription());
+//            System.out.println("\nWeather:  " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
+//                    + "\nTemperature: " + arr[index].getTemp() +
+//                    "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
+//                    + arr2[index].getSpeed());
             return true;
-        } else {
-            boolean check = false;
-            try {
-                LineNumberReader reader = new LineNumberReader(new FileReader("CurrentInfo.txt"));
-                while (reader.readLine() != null) {
-                    numberOfLines++;
-                }
-                reader.close();
-
-            } catch (IOException e) {
-                System.err.println("Error reading file: " + e.getMessage());
-            }
-            Main[] arr = new Main[numberOfLines];
-            Weather[] arr1 = new Weather[numberOfLines];
-            Wind[] arr2 = new Wind[numberOfLines];
-            try {
-                Scanner scanner = new Scanner(new File("CurrentInfo.txt"));
-                scanner.useDelimiter(delimiter); // Set delimiter for splitting
-
-                for (int i = 0; i < arr.length; i++) {
-                    arr[i] = new Main();
-                    arr1[i] = new Weather();
-                    arr2[i] = new Wind();
-                    arr[i].setLocation(scanner.next());
-                    arr1[i].setMain(scanner.next());
-                    arr1[i].setDescription(scanner.next());
-                    arr[i].setTemp(Double.parseDouble(scanner.next()));
-                    arr[i].setPressure(Integer.parseInt(scanner.next()));
-                    arr[i].setHumidity(Integer.parseInt(scanner.next()));
-                    arr2[i].setSpeed(Double.parseDouble(scanner.next()));
-                    String firstLine = scanner.nextLine();
-                    arr[i].setDate(firstLine.substring(1));
-
-                }
-                scanner.close();
-            } catch (FileNotFoundException e) {
-                System.err.println("Error opening file:  " + e.getMessage());
-            }
-            int index = 0;
-            for (int i = 0; i < arr.length; i++) {
-
-                if (arr[i].getLocation().equalsIgnoreCase(location.getName())) {
-                    if (arr[i].getDate().equals(String.valueOf(today))) {
-                        check = true;
-                        index = i;
-
-                    }
-                }
-            }
-            if (check == false) {
-                return false;
-            }
-            System.out.print("\n***************Data fetched from FILE****************");
-             noification.printWeatherCondition( arr1[index].getDescription());
-            System.out.println("\nWeather:  " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
-                    + "\nTemperature: " + arr[index].getTemp() +
-                    "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
-                    + arr2[index].getSpeed());
-            return true;
-        }
+//        }
     }
 
     @Override
@@ -2553,7 +2553,7 @@ class Notification {
     }
 }
 
-// * GUI Logic Sterts here
+// * GUI Logic Starts here
 class InputGUI extends JFrame {
     private JTextField locationField;
     private JTextField longitudeField;
@@ -2689,9 +2689,11 @@ class MainMenu extends JFrame { // Storage object exists here to interchange wit
         // actual
         // API
 
-        Location loc = new Location("h", latitude, longitude);
+        Location loc = new Location("", latitude, longitude);
+
         menu.addPropertyChangeListener(evt -> {
             if ("ShowCurrentWeatherButtonClicked".equals(evt.getPropertyName())) {
+
                 showWeather.setVisible(true);
                 basicInfo.setVisible(false);
                 showSunTime.setVisible(false);
@@ -2899,10 +2901,10 @@ class ShowWeather extends JPanel {
 
     // Method to update current weather information
     public void updateWeatherInfo(String weather, String description, double temperature, double pressure,
-            double humidity, double windSpeed) {
+                                  double humidity, double windSpeed) {
         weatherLabel.setText("Current Weather: " + weather);
         descriptionLabel.setText("Weather Description: " + description);
-        temperatureLabel.setText("Temperature: " + temperature + "°C");
+        temperatureLabel.setText("Temperature: " + temperature + "°K");
         pressureLabel.setText("Pressure: " + pressure + " hPa");
         humidityLabel.setText("Humidity: " + humidity + "%");
         windSpeedLabel.setText("Wind Speed: " + windSpeed + " m/s");
@@ -3319,7 +3321,7 @@ class JavaFX implements UserInterface {
     }
 
     public Location getLocationInput() {
-        return new Location("h", 1, 1);
+        return new Location("", 1, 1);
     }
 
     public int getMenuChoice() {
@@ -3345,6 +3347,7 @@ class JavaFX implements UserInterface {
     }
 
     public List<String> showCurrentWeather(WeatherService weatherService, Location location, Storage storage) {
+        boolean bool=storage.checkCurrentInfo(location);
         String main;
         String description;
         double temp;
@@ -3366,12 +3369,14 @@ class JavaFX implements UserInterface {
         i.add(Integer.toString(pressure));
         i.add(Integer.toString(humidity));
         i.add(Double.toString(speed));
-
-        storage.saveCurrentInfo(location, main, description, temp, pressure, humidity, speed);
+if(!bool) {
+    storage.saveCurrentInfo(location, main, description, temp, pressure, humidity, speed);
+}
         return i;
     }
 
     public List<String> showBasicInfo(WeatherService weatherService, Location location, Storage storage) {
+        boolean bool=storage.checkBasicInfo(location);
         double feels_like;
         double temp_min;
         double temp_max;
@@ -3385,11 +3390,14 @@ class JavaFX implements UserInterface {
         i.add(Double.toString(feels_like));
         i.add(Double.toString(temp_min));
         i.add(Double.toString(temp_max));
-        storage.saveBasicInfo(location, feels_like, temp_min, temp_max);
+        if(!bool) {
+            storage.saveBasicInfo(location, feels_like, temp_min, temp_max);
+        }
         return i;
     }
 
     public List<String> showSunriseSunset(WeatherService weatherService, Location location, Storage storage) {
+        boolean bool=storage.checkSunInfo(location);
         // Implement as required
         long sun_rise;
         long sun_set;
@@ -3408,13 +3416,15 @@ class JavaFX implements UserInterface {
         List<String> i = new ArrayList<>();
         i.add(SunR);
         i.add(SunS);
-
-        storage.saveSunInfo(location, SunR, SunS);
+if(!bool) {
+    storage.saveSunInfo(location, SunR, SunS);
+}
         return i;
     }
 
     public Object[][] showWeatherForecast(WeatherService weatherService, Location location, Storage storage) {
         // Implement as required
+        boolean bool=storage.checkForecastInfo(location);
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
 
         Forecast ForecastData = weatherService.getForecastData(myloc);
@@ -3442,19 +3452,23 @@ class JavaFX implements UserInterface {
 
             i++;
         }
-        storage.saveForecastInfo(location, ForecastData);
+        if(!bool){
+        storage.saveForecastInfo(location, ForecastData);}
         return forecastData;
     }
 
     public int showAirPollution(WeatherService weatherService, Location location, Storage storage) {
+        boolean bool=storage.checkAirPollution(location);
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         AirPollution MyPollutionData = weatherService.getPollutionData(myloc);
         int aqi = MyPollutionData.getList().get(0).getMain().getAqi();
-        storage.saveAirPollution(location, aqi, MyPollutionData.getList().get(0));
+        if(!bool){
+        storage.saveAirPollution(location, aqi, MyPollutionData.getList().get(0));}
         return aqi;
     }
 
     public List<Double> showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
+        boolean bool=storage.checkPollutingGases(location);
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         AirPollution MyPollutionData = weatherService.getPollutionData(myloc);
         AirQuality object = MyPollutionData.getList().get(0);
@@ -3478,8 +3492,8 @@ class JavaFX implements UserInterface {
         i.add(pm2);
         i.add(pm10);
         i.add(nh3);
-
-        storage.saveAirPollution(location, aqi, MyPollutionData.getList().get(0));
+if(!bool){
+        storage.saveAirPollution(location, aqi, MyPollutionData.getList().get(0));}
         return i;
     }
 
