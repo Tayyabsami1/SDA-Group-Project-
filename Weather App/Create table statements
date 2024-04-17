@@ -2,59 +2,54 @@
 Go and creeate a new Data Base in MSSQl server with Name WeatherAPP--
 then create these tables using a query 
 
+USE WeatherAPP;
 
 CREATE TABLE Locations (
-  id SERIAL PRIMARY KEY,
+  id INT PRIMARY KEY IDENTITY,
   name VARCHAR(255) NOT NULL,
   latitude DECIMAL(9, 6) NOT NULL,
   longitude DECIMAL(9, 6) NOT NULL
 );
 
-
 CREATE TABLE WeatherData (
-  id SERIAL PRIMARY KEY,
-  location_id INTEGER REFERENCES Locations(id),
+  id INT PRIMARY KEY IDENTITY,
+  location_id INT FOREIGN KEY REFERENCES Locations(id),
   temperature DECIMAL(5, 2) NOT NULL,
   humidity DECIMAL(5, 2) NOT NULL,
   wind_speed DECIMAL(5, 2) NOT NULL,
   pressure DECIMAL(5, 2) NOT NULL,
-  time TIMESTAMP NOT NULL
+  time DATETIME NOT NULL
 );
+
 CREATE TABLE SunriseSunsetData (
-  id SERIAL PRIMARY KEY,
-  location_id INTEGER REFERENCES Locations(id),
-  sunrise TIMESTAMP NOT NULL,
-  sunset TIMESTAMP NOT NULL,
-  time TIMESTAMP NOT NULL
-);
-CREATE TABLE SunriseSunsetData (
-  id SERIAL PRIMARY KEY,
-  location_id INTEGER REFERENCES Locations(id),
-  sunrise TIMESTAMP NOT NULL,
-  sunset TIMESTAMP NOT NULL,
-  time TIMESTAMP NOT NULL
+  id INT PRIMARY KEY IDENTITY,
+  location_id INT FOREIGN KEY REFERENCES Locations(id),
+  sunrise DATETIME NOT NULL,
+  sunset DATETIME NOT NULL,
+  time DATETIME NOT NULL
 );
 
 CREATE TABLE AirQualityData (
-  id SERIAL PRIMARY KEY,
-  location_id INTEGER REFERENCES Locations(id),
-  aqi INTEGER NOT NULL,
+  id INT PRIMARY KEY IDENTITY,
+  location_id INT FOREIGN KEY REFERENCES Locations(id),
+  aqi INT NOT NULL,
   pm2_5 DECIMAL(5, 2) NOT NULL,
   pm10 DECIMAL(5, 2) NOT NULL,
   co DECIMAL(5, 2) NOT NULL,
   no2 DECIMAL(5, 2) NOT NULL,
   o3 DECIMAL(5, 2) NOT NULL,
   so2 DECIMAL(5, 2) NOT NULL,
-  time TIMESTAMP NOT NULL
+  time DATETIME NOT NULL
 );
+
 CREATE TABLE BasicInfo (
-  id SERIAL PRIMARY KEY,
-  location_id INTEGER REFERENCES Locations(id),
+  id INT PRIMARY KEY IDENTITY,
+  location_id INT FOREIGN KEY REFERENCES Locations(id),
   temp DECIMAL(5, 2) NOT NULL,
   temp_min DECIMAL(5, 2) NOT NULL,
   temp_max DECIMAL(5, 2) NOT NULL,
   feels_like DECIMAL(5, 2) NOT NULL,
   pressure DECIMAL(5, 2) NOT NULL,
   humidity DECIMAL(5, 2) NOT NULL,
-  time TIMESTAMP NOT NULL
+  time DATETIME NOT NULL
 );
