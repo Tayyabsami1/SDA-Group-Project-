@@ -3374,7 +3374,14 @@ class JavaFX implements UserInterface {
     }
 
     public List<String> showCurrentWeather(WeatherService weatherService, Location location, Storage storage) {
-        boolean bool=storage.checkCurrentInfo(location);
+        File file = new File("CurrentInfo1.txt");
+        boolean bool;
+        if (file.exists()) {
+            bool = storage.checkCurrentInfo(location);
+        }
+        else{
+            bool=false;
+        }
         String main;
         String description;
         double temp;
@@ -3403,7 +3410,15 @@ class JavaFX implements UserInterface {
     }
 
     public List<String> showBasicInfo(WeatherService weatherService, Location location, Storage storage) {
-        boolean bool=storage.checkBasicInfo(location);
+        File file = new File("BasicInfo1.txt");
+        boolean bool;
+        if (file.exists()) {
+            bool = storage.checkBasicInfo(location);
+        }
+        else{
+            bool=false;
+        }
+
         double feels_like;
         double temp_min;
         double temp_max;
@@ -3424,7 +3439,15 @@ class JavaFX implements UserInterface {
     }
 
     public List<String> showSunriseSunset(WeatherService weatherService, Location location, Storage storage) {
-        boolean bool=storage.checkSunInfo(location);
+        File file = new File("SunInfo1.txt");
+        boolean bool;
+        if (file.exists()) {
+            bool = storage.checkSunInfo(location);
+        }
+        else{
+            bool=false;
+        }
+
         // Implement as required
         long sun_rise;
         long sun_set;
@@ -3450,8 +3473,15 @@ class JavaFX implements UserInterface {
     }
 
     public Object[][] showWeatherForecast(WeatherService weatherService, Location location, Storage storage) {
+        File file = new File("ForecastInfo1.txt");
+        boolean bool;
+        if (file.exists()) {
+            bool = storage.checkForecastInfo(location);
+        }
+        else{
+            bool=false;
+        }
         // Implement as required
-        boolean bool=storage.checkForecastInfo(location);
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
 
         Forecast ForecastData = weatherService.getForecastData(myloc);
@@ -3485,7 +3515,14 @@ class JavaFX implements UserInterface {
     }
 
     public int showAirPollution(WeatherService weatherService, Location location, Storage storage) {
-        boolean bool=storage.checkAirPollution(location);
+        File file = new File("AirPollution1.txt");
+        boolean bool;
+        if (file.exists()) {
+            bool = storage.checkAirPollution(location);
+        }
+        else{
+            bool=false;
+        }
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         AirPollution MyPollutionData = weatherService.getPollutionData(myloc);
         int aqi = MyPollutionData.getList().get(0).getMain().getAqi();
@@ -3495,7 +3532,15 @@ class JavaFX implements UserInterface {
     }
 
     public List<Double> showPollutingGases(WeatherService weatherService, Location location, Storage storage) {
-        boolean bool=storage.checkPollutingGases(location);
+        File file = new File("AirPollution1.txt");
+        boolean bool;
+        if (file.exists()) {
+            bool = storage.checkPollutingGases(location);
+        }
+        else{
+            bool=false;
+        }
+
         Coord myloc = new Coord(location.getLatitude(), location.getLongitude());
         AirPollution MyPollutionData = weatherService.getPollutionData(myloc);
         AirQuality object = MyPollutionData.getList().get(0);
@@ -3532,21 +3577,20 @@ class MainApp {
 
     public static void main(String[] args) {
 
+        UserInterface ui = new JavaFX(); // Can interchange with TerminalUI and JavaFX
         Scanner scanner1 = new Scanner(System.in);
-        System.out.println("Run project in (1) Terminal or (2) GUI?");
-        int mychoice = scanner1.nextInt();
+
 
         // ? GUI Logic
-        if (mychoice == 2) {
-            UserInterface ui = new JavaFX();
+        if (ui instanceof JavaFX) {
+
             ui.getMenuChoice();
         }
 
         // Terminal Logic
 
         else {
-            UserInterface ui = new TerminalUI();
-            Storage storage = new FileStorage();
+            Storage storage = new FileStorage(); // Can interchange with FileStorage and Database
             WeatherService weatherService = new WeatherServiceImpl();
 
             int option;
