@@ -1112,7 +1112,7 @@ class TerminalUI implements UserInterface {
         while (true) {
 
             int choice = getMenuChoice1();
-
+            FileStorage.setter(true);
             switch (choice) {
 
                 case 1: {
@@ -1685,10 +1685,12 @@ class FileStorage implements Storage {
         } else {
             air_Quality = "Very Poor";
         }
-        Notification notification = new Notification("Air Pollution Data:");
-        System.out.print("\n***************Data fetched from FILE****************");
-        System.out.println("\nAir Pollution Data: \nAir Quality Index: " + arr[index].getAqi());
-        notification.printAirQuality( air_Quality);
+        if(check22) {
+            Notification notification = new Notification("Air Pollution Data:");
+            System.out.print("\n***************Data fetched from FILE****************");
+            System.out.println("\nAir Pollution Data: \nAir Quality Index: " + arr[index].getAqi());
+            notification.printAirQuality(air_Quality);
+        }
         return true;
     }
 
@@ -1757,15 +1759,17 @@ class FileStorage implements Storage {
             if (check == false) {
                 return false;
             }
-            System.out.print("\n***************Data fetched from FILE****************");
+            if(check22) {
+                System.out.print("\n***************Data fetched from FILE****************");
 
-            System.out.println(
-                    "\nDetails Of Polluting Gases: \nCO: " + arr1[index].getCo() + "\nNO: " + arr1[index].getNo()
-                            + "\nNO2: " + arr1[index].getNo2() +
-                            "\nO3: " + arr1[index].getO3() + "\nSO2: " + arr1[index].getSo2() + "\nPM2_5: "
-                            + arr1[index].getPm2_5()
-                            +
-                            "\nPM10: " + arr1[index].getPm10() + "\nNH3: " + arr1[index].getNh3());
+                System.out.println(
+                        "\nDetails Of Polluting Gases: \nCO: " + arr1[index].getCo() + "\nNO: " + arr1[index].getNo()
+                                + "\nNO2: " + arr1[index].getNo2() +
+                                "\nO3: " + arr1[index].getO3() + "\nSO2: " + arr1[index].getSo2() + "\nPM2_5: "
+                                + arr1[index].getPm2_5()
+                                +
+                                "\nPM10: " + arr1[index].getPm10() + "\nNH3: " + arr1[index].getNh3());
+            }
             return true;
         } else {
             boolean check = false;
@@ -1822,16 +1826,27 @@ class FileStorage implements Storage {
             if (check == false) {
                 return false;
             }
-            System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println(
-                    "\nDetails Of Polluting Gases: \nCO: " + arr1[index].getCo() + "\nNO: " + arr1[index].getNo()
-                            + "\nNO2: " + arr1[index].getNo2() +
-                            "\nO3: " + arr1[index].getO3() + "\nSO2: " + arr1[index].getSo2() + "\nPM2_5: "
-                            + arr1[index].getPm2_5()
-                            +
-                            "\nPM10: " + arr1[index].getPm10() + "\nNH3: " + arr1[index].getNh3());
+            if(check22) {
+                System.out.print("\n***************Data fetched from FILE****************");
+                System.out.println(
+                        "\nDetails Of Polluting Gases: \nCO: " + arr1[index].getCo() + "\nNO: " + arr1[index].getNo()
+                                + "\nNO2: " + arr1[index].getNo2() +
+                                "\nO3: " + arr1[index].getO3() + "\nSO2: " + arr1[index].getSo2() + "\nPM2_5: "
+                                + arr1[index].getPm2_5()
+                                +
+                                "\nPM10: " + arr1[index].getPm10() + "\nNH3: " + arr1[index].getNh3());
+            }
             return true;
         }
+    }
+ public static boolean check22=false;
+    public static void setter(boolean t)
+    {
+        check22=t;
+    }
+    public static boolean checker()
+    {
+        return check22;
     }
 
     @Override
@@ -1968,21 +1983,23 @@ class FileStorage implements Storage {
             if (check == false) {
                 return false;
             }
-            System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println("\nWeather Forecast for 5 days : ");
-            int i = 0;
-            for (int j = 0; j < 40; j++) {
+            if(check22) {
+                System.out.print("\n***************Data fetched from FILE****************");
+                System.out.println("\nWeather Forecast for 5 days : ");
+                int i = 0;
+                for (int j = 0; j < 40; j++) {
 
-                System.out.println(++i + ":\n\tWeather: " + array[index][j].getWeather().get(0).getMain() +
-                        ":\n\tDescription: " + array[index][j].getWeather().get(0).getDescription() +
-                        ":\n\tTemperature: " + array[index][j].getMain().getTemp() +
-                        ":\n\tPressure: " + array[index][j].getMain().getPressure() +
-                        ":\n\tHumidity: " + array[index][j].getMain().getHumidity() +
-                        ":\n\tFeels Like: " + array[index][j].getMain().getFeelsLike() +
-                        ":\n\tMinimum Temperature: " + array[index][j].getMain().getTempMin() +
-                        ":\n\tMaximum Temperature: " + array[index][j].getMain().getTempMax() +
-                        ":\n\tWind Speed: " + array[index][j].getWind().getSpeed() +
-                        ":\n\tTime of Data Forecasted: " + array[index][j].getDtText() + "\n");
+                    System.out.println(++i + ":\n\tWeather: " + array[index][j].getWeather().get(0).getMain() +
+                            ":\n\tDescription: " + array[index][j].getWeather().get(0).getDescription() +
+                            ":\n\tTemperature: " + array[index][j].getMain().getTemp() +
+                            ":\n\tPressure: " + array[index][j].getMain().getPressure() +
+                            ":\n\tHumidity: " + array[index][j].getMain().getHumidity() +
+                            ":\n\tFeels Like: " + array[index][j].getMain().getFeelsLike() +
+                            ":\n\tMinimum Temperature: " + array[index][j].getMain().getTempMin() +
+                            ":\n\tMaximum Temperature: " + array[index][j].getMain().getTempMax() +
+                            ":\n\tWind Speed: " + array[index][j].getWind().getSpeed() +
+                            ":\n\tTime of Data Forecasted: " + array[index][j].getDtText() + "\n");
+                }
             }
             return true;
         } else {
@@ -2056,21 +2073,23 @@ class FileStorage implements Storage {
             if (check == false) {
                 return false;
             }
-            System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println("\nWeather Forecast for 5 days : ");
-            int i = 0;
-            for (int j = 0; j < 40; j++) {
+            if(check22) {
+                System.out.print("\n***************Data fetched from FILE****************");
+                System.out.println("\nWeather Forecast for 5 days : ");
+                int i = 0;
+                for (int j = 0; j < 40; j++) {
 
-                System.out.println(++i + ":\n\tWeather: " + array[index][j].getWeather().get(0).getMain() +
-                        ":\n\tDescription: " + array[index][j].getWeather().get(0).getDescription() +
-                        ":\n\tTemperature: " + array[index][j].getMain().getTemp() +
-                        ":\n\tPressure: " + array[index][j].getMain().getPressure() +
-                        ":\n\tHumidity: " + array[index][j].getMain().getHumidity() +
-                        ":\n\tFeels Like: " + array[index][j].getMain().getFeelsLike() +
-                        ":\n\tMinimum Temperature: " + array[index][j].getMain().getTempMin() +
-                        ":\n\tMaximum Temperature: " + array[index][j].getMain().getTempMax() +
-                        ":\n\tWind Speed: " + array[index][j].getWind().getSpeed() +
-                        ":\n\tTime of Data Forecasted: " + array[index][j].getDtText() + "\n");
+                    System.out.println(++i + ":\n\tWeather: " + array[index][j].getWeather().get(0).getMain() +
+                            ":\n\tDescription: " + array[index][j].getWeather().get(0).getDescription() +
+                            ":\n\tTemperature: " + array[index][j].getMain().getTemp() +
+                            ":\n\tPressure: " + array[index][j].getMain().getPressure() +
+                            ":\n\tHumidity: " + array[index][j].getMain().getHumidity() +
+                            ":\n\tFeels Like: " + array[index][j].getMain().getFeelsLike() +
+                            ":\n\tMinimum Temperature: " + array[index][j].getMain().getTempMin() +
+                            ":\n\tMaximum Temperature: " + array[index][j].getMain().getTempMax() +
+                            ":\n\tWind Speed: " + array[index][j].getWind().getSpeed() +
+                            ":\n\tTime of Data Forecasted: " + array[index][j].getDtText() + "\n");
+                }
             }
             return true;
         }
@@ -2165,9 +2184,11 @@ class FileStorage implements Storage {
             if (check == false) {
                 return false;
             }
-            System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println("\nFeels Like: " + arr[index].getFeelsLike() + "\nMinimum Temperature: "
-                    + arr[index].getTempMin() + "\nMaximum Temperature: " + arr[index].getTempMax());
+            if(check22) {
+                System.out.print("\n***************Data fetched from FILE****************");
+                System.out.println("\nFeels Like: " + arr[index].getFeelsLike() + "\nMinimum Temperature: "
+                        + arr[index].getTempMin() + "\nMaximum Temperature: " + arr[index].getTempMax());
+            }
             return true;
         } else {
             boolean check = false;
@@ -2214,9 +2235,11 @@ class FileStorage implements Storage {
             if (check == false) {
                 return false;
             }
-            System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println("\nFeels Like: " + arr[index].getFeelsLike() + "\nMinimum Temperature: "
-                    + arr[index].getTempMin() + "\nMaximum Temperature: " + arr[index].getTempMax());
+            if(check22) {
+                System.out.print("\n***************Data fetched from FILE****************");
+                System.out.println("\nFeels Like: " + arr[index].getFeelsLike() + "\nMinimum Temperature: "
+                        + arr[index].getTempMin() + "\nMaximum Temperature: " + arr[index].getTempMax());
+            }
             return true;
         }
 
@@ -2310,8 +2333,10 @@ class FileStorage implements Storage {
             if (check == false) {
                 return false;
             }
-            System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println("\nSun Rise Time: " + Sunrise[index] + "\nSun Set Time: " + Sunset[index]);
+            if(check22) {
+                System.out.print("\n***************Data fetched from FILE****************");
+                System.out.println("\nSun Rise Time: " + Sunrise[index] + "\nSun Set Time: " + Sunset[index]);
+            }
             return true;
         } else {
             boolean check = false;
@@ -2359,8 +2384,10 @@ class FileStorage implements Storage {
             if (check == false) {
                 return false;
             }
-            System.out.print("\n***************Data fetched from FILE****************");
-            System.out.println("\nSun Rise Time: " + Sunrise[index] + "\nSun Set Time: " + Sunset[index]);
+            if(check22) {
+                System.out.print("\n***************Data fetched from FILE****************");
+                System.out.println("\nSun Rise Time: " + Sunrise[index] + "\nSun Set Time: " + Sunset[index]);
+            }
             return true;
         }
 
@@ -2479,14 +2506,16 @@ class FileStorage implements Storage {
             if (!check) {
                 return false;
             }
-            Notification notification = new Notification("Weather condition:");
+            if(check22) {
+                Notification notification = new Notification("Weather condition:");
 
-            System.out.println("\n***************Data fetched from FILE****************");
-            notification. printWeatherCondition(arr1[index].getDescription());
-            System.out.println("Weather: " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
-                    + "\nTemperature: " + arr[index].getTemp() +
-                    "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
-                    + arr2[index].getSpeed());
+                System.out.println("\n***************Data fetched from FILE****************");
+                notification.printWeatherCondition(arr1[index].getDescription());
+                System.out.println("Weather: " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
+                        + "\nTemperature: " + arr[index].getTemp() +
+                        "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
+                        + arr2[index].getSpeed());
+            }
 
             return true;
         } else {
@@ -2547,14 +2576,16 @@ class FileStorage implements Storage {
             if (check == false) {
                 return false;
             }
-            Notification notification = new Notification("Weather condition:");
+            if(check22) {
+                Notification notification = new Notification("Weather condition:");
 
-            System.out.println("\n***************Data fetched from FILE****************");
-            notification. printWeatherCondition(arr1[index].getDescription());
-            System.out.println("Weather: " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
-                    + "\nTemperature: " + arr[index].getTemp() +
-                    "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
-                    + arr2[index].getSpeed());
+                System.out.println("\n***************Data fetched from FILE****************");
+                notification.printWeatherCondition(arr1[index].getDescription());
+                System.out.println("Weather: " + arr1[index].getMain() + "\nDescription: " + arr1[index].getDescription()
+                        + "\nTemperature: " + arr[index].getTemp() +
+                        "\nPressure: " + arr[index].getPressure() + "\nHumidity: " + arr[index].getHumidity() + "\nSpeed: "
+                        + arr2[index].getSpeed());
+            }
             return true;
         }
     }
